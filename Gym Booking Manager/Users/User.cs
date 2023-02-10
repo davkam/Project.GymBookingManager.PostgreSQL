@@ -11,6 +11,9 @@ namespace Gym_Booking_Manager.Users
         public string email { get; set; }
         public string loginName { get; set; }
         public string loginPass { get; set; }
+        public DateTime MembershipStartDate { get; set; }
+        public DateTime MembershipEndDate { get; set; }
+        public bool IsActive { get; set; }
 
         protected User(int id, string name, int ssn, string phone, string email, string loginName, string loginPass)
         {
@@ -21,6 +24,7 @@ namespace Gym_Booking_Manager.Users
             this.email = email;
             this.loginName = loginName;
             this.loginPass = loginPass;
+
         }
         public void UpdateInfo()
         {
@@ -95,13 +99,25 @@ namespace Gym_Booking_Manager.Users
                 if (strings[0] == "Customer") users.Add(new Customer(int.Parse(strings[1]), strings[2], int.Parse(strings[3]), strings[4], strings[5], strings[6], strings[7], DateTime.Parse(strings[8]), DateTime.Parse(strings[9]), bool.Parse(strings[10])));
             }
         }
+        public void SaveUsers(List<User> users)
+        {
+            string[] lines = File.ReadAllLines("Users/Users.txt");
+            int nextLine = lines.Length + 1;
+            using (StreamWriter writer = new StreamWriter("Users/Users.txt", true))
+            {
+                foreach (User user in users)
+                {
+                    writer.WriteLine($"Customer;{GetNextID};{name};{ssn};{phone};{email};{loginName};{loginPass};{DateTime.Now};{MembershipEndDate};True");
+                }
+            }
+        }
         public abstract void Menu();
     }
     public class Staff : User
     {
         public Staff(int id, string name, int ssn, string phone, string email, string loginName, string loginPass)
             : base(id, name, ssn, phone, email, loginName, loginPass) { }
-        public void RegisterUser() 
+        public void RegisterUser(List<User> users) 
         {
             Console.WriteLine("Enter user name: ");
             string name = Console.ReadLine();
@@ -119,6 +135,7 @@ namespace Gym_Booking_Manager.Users
 
             Console.WriteLine("Enter 1 for One Day membership, 2 for One Month membership, 3 for One Year membership:");
             int membershipChoice = int.Parse(Console.ReadLine());
+            DateTime startDate = DateTime.Now;
             DateTime membershipDuration;
             switch (membershipChoice)
             {
@@ -132,15 +149,15 @@ namespace Gym_Booking_Manager.Users
                     membershipDuration = DateTime.Now.AddYears(1);
                     break;
                 default:
-                    Console.WriteLine("Invalid membership choice. Defaulting to Daily pass membership.");
+                    Console.WriteLine("Invalid membership choice. Defaulting to One Day membership.");
                     membershipDuration = DateTime.Now.AddDays(1);
                     break;
             }
-
-            using (StreamWriter writer = new StreamWriter("Users/Users.txt", true))
-            {
-                writer.WriteLine($"Customer;{id};{name};{ssn};{phone};{email};{loginName};{loginPass};{DateTime.Now};{membershipDuration};True");
-            }
+            DateTime MembershipEndDate = membershipDuration;
+            int nextID = GetNextID();
+            Customer customer = new Customer(nextID, name, ssn, phone, email, loginName, loginPass, DateTime.Now, membershipDuration, true);
+            users.Add(customer);
+            SaveUsers(users);
         }
         public void UnregisterUser() { }
         public void ManageAccounts() { }
@@ -154,7 +171,7 @@ namespace Gym_Booking_Manager.Users
                 switch (input)
                 {
                     case "1":
-                        RegisterUser();
+                        RegisterUser(users);
                         break;
                     case "2":
                         UnregisterUser();
