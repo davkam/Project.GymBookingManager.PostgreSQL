@@ -2,6 +2,8 @@
 using Gym_Booking_Manager.Users;
 using Gym_Booking_Manager.Reservations;
 using Gym_Booking_Manager.Calendars;
+using System.Globalization;
+using System;
 
 namespace Gym_Booking_Manager
 {
@@ -10,10 +12,16 @@ namespace Gym_Booking_Manager
     {
         static void Main(string[] args)
         {
-            int activeUser;
+            int activeUser=-1;
             User.Load();
+<<<<<<< HEAD
+=======
+            Reservable.Load();
+            Reservation.Load();
+            Activity.Load();            
+>>>>>>> origin/mergemain
             activeUser = User.LogIn();
-            User.users[activeUser].Menu();
+            if(activeUser!=-1)User.users[activeUser].Menu();
         }
     }
 }
