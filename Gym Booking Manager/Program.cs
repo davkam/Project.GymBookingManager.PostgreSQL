@@ -1,8 +1,8 @@
-﻿using Gym_Booking_Manager.Users;
-using Gym_Booking_Manager.Activities;
-using Gym_Booking_Manager.Reservations;
+﻿using Gym_Booking_Manager.Activities;
 using Gym_Booking_Manager.Logger;
-using System.ComponentModel;
+using Gym_Booking_Manager.Reservables;
+using Gym_Booking_Manager.Reservations;
+using Gym_Booking_Manager.Users;
 
 namespace Gym_Booking_Manager
 {
@@ -16,7 +16,8 @@ namespace Gym_Booking_Manager
             User.LoadUsers();
             Reservable.LoadReservables();
             Reservation.LoadReservations();
-            Activity.LoadActivities();            
+            Activity.LoadActivities(); 
+            
             // MAIN SOFTWARE LOOP RUNS BELOW:
             RunGBM();
         }
@@ -40,13 +41,11 @@ namespace Gym_Booking_Manager
                 }
                 else
                 {
-                    userID = User.Login();
+                    userID = User.LoginUser();
                     if (userID != -1)
                     {
                         currentUser = User.users.Find(u => u.id == userID);
-                        currentUser.Menu();
-
-                        logger.LogActivity($"INFO: RunGMB() - Login attempt successful. USER: {currentUser.loginName}");
+                        currentUser.MainMenu();
                     }
                     else 
                     { 

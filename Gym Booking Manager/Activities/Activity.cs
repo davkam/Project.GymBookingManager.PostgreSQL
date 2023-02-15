@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Gym_Booking_Manager.Reservables;
 using Gym_Booking_Manager.Reservations;
+using Gym_Booking_Manager.Schedules;
 using Gym_Booking_Manager.Users;
-using Gym_Booking_Manager.Calendars;
 
 namespace Gym_Booking_Manager.Activities
 {
@@ -17,12 +16,12 @@ namespace Gym_Booking_Manager.Activities
         public bool open { get; set; }
         public int limit { get; set; }
         public Staff instructor { get; set; }
-        public Calendar date { get; set; }
+        public Schedule date { get; set; }
         public Reservation reservation { get; set; }
         public List<Customer>? participants { get; set; }
 
         public Activity(int id, string name, string description, bool open, int limit,
-            Staff instructor, Calendar date, Reservation reservation, List<Customer>? participants = default(List<Customer>))
+            Staff instructor, Schedule date, Reservation reservation, List<Customer>? participants = default(List<Customer>))
         {
             this.id = id;
             this.name = name;
@@ -56,9 +55,9 @@ namespace Gym_Booking_Manager.Activities
                         }
                     }
                     var staff = (Staff)User.users.Find(u => u.id == int.Parse(stringsA[5]));
-                    var calendar = new Calendar(DateTime.Parse(stringsA[6]), DateTime.Parse(stringsA[7]));
+                    var schedule = new Schedule(DateTime.Parse(stringsA[6]), DateTime.Parse(stringsA[7]));
                     var reservation = Reservation.reservations.Find(r => r.id == int.Parse(stringsA[8]));
-                    var activity = new Activity(int.Parse(stringsA[0]), stringsA[1], stringsA[2], bool.Parse(stringsA[3]), int.Parse(stringsA[4]), staff, calendar, reservation, participants);
+                    var activity = new Activity(int.Parse(stringsA[0]), stringsA[1], stringsA[2], bool.Parse(stringsA[3]), int.Parse(stringsA[4]), staff, schedule, reservation, participants);
                     activities.Add(activity);
                 }
                 Program.logger.LogActivity("INFO: LoadActivities() - Read data (\"Activities/Activities.txt\") successful.");
@@ -91,81 +90,11 @@ namespace Gym_Booking_Manager.Activities
             }
             catch { Program.logger.LogActivity("ERROR: SaveActivities() - Write data (\"Activities/Activities.txt\") unsuccessful."); }
         }
-        private static int GetID()
+        private static int GetActivityID()
         {
             int id = getActivityID;
             getActivityID++;
-            return id;
-                var participants = new List<Customer>();
-                
-                // Adding objects (Customer) from public list (User.users) to new list (participants) based on integers (User.id).
-                foreach (string strB in stringsB)
-                {
-                    if(strB.Length>0)participants.Add((Customer)User.users.Find(user => user.id == int.Parse(strB)));
-                }
-
-                // Adding new objects (Activity) to public list (Activity.activities) based on values read from file (Activities.txt).
-                activities.Add(new Activity(int.Parse(stringsA[0]), stringsA[1], stringsA[2], bool.Parse(stringsA[3]), int.Parse(stringsA[4]),
-                    (Staff)User.users.Find(u => u.id == int.Parse(stringsA[5])), new Calendar(DateTime.Parse(stringsA[6]), DateTime.Parse(stringsA[7])), Reservation.reservations.Find(r => r.id == int.Parse(stringsA[8])), participants));
-            }
-        }
-
-        public static void SaveActivities()
-        {
-            using (StreamWriter writer = new StreamWriter("Activities/Activities.txt", false))
-            {
-                writer.WriteLine(activityID);
-                foreach (Activity activity in activities)
-                {
-                    string participants = string.Empty;
-                    foreach (Customer customer in activity.participants)
-                    {
-                        participants += $"{customer.id},";
-                    }
-                    if(activity.participants.Count()>0)participants = participants[0..^1];
-                    writer.WriteLine($"{activity.id};{activity.name};{activity.description};{activity.open};{activity.limit};{activity.instructor.id};{activity.date.timeFrom};" +
-                        $"{activity.date.timeTo};{activity.reservation.id};{participants}");
-                }
-            }
-        }
-        public static void EnterDate(DateTime[] date)
-        {
-        bool go = true;
-        string input;
-        rerun:
-            while (go == true)
-            {
-                Console.WriteLine("Enter a date and time of start of start of Activity (in the format yyyy-MM-dd HH):");
-                input = Console.ReadLine() + ":00:00";
-                if (DateTime.TryParse(input, out date[0]))
-                {
-                    go = false;
-                }
-                else
-                {
-                    Console.WriteLine("Invalid date and time format.");
-                }
-            }
-            go = true;
-            while (go == true)
-            {
-                Console.WriteLine("Enter a date and time of end of Activity (in the format yyyy-MM-dd HH):");
-                input = Console.ReadLine() + ":00:00";
-                if (DateTime.TryParse(input, out date[1]))
-                {
-                    go = false;
-                }
-                else
-                {
-                    Console.WriteLine("Invalid date and time format.");
-                }
-            }
-            if (date[0] >= date[1])
-            {
-                Console.WriteLine("End date/time is the same or earlier then start date/time, try again.");
-                go = true;
-                goto rerun;
-            }
+            return id;    
         }
         public static void ChooseReservables(int idStaff, DateTime[] date, List<int> reservableToList)
         {         
@@ -197,11 +126,11 @@ namespace Gym_Booking_Manager.Activities
         }
         public static void NewActivity(int idStaff)
         {
-            int id = GetID(); string Name; string Description; bool Open = true; int participantsNo = 0; Staff Instructor = User.users[idStaff] as Staff; List<Customer>? Participants=new List<Customer>();
+            int id = GetActivityID(); string Name; string Description; bool Open = true; int participantsNo = 0; Staff Instructor = User.users[idStaff] as Staff; List<Customer>? Participants=new List<Customer>();
             bool overlap = false;
             List<int> reservableToList = new List<int>();
             DateTime[] date = new DateTime[2];
-            EnterDate(date);
+            Schedule.DateSelecter(date);
             for (int i = 0; i < Reservable.reservables.Count(); i++)
             {
                 overlap = false;
@@ -261,7 +190,7 @@ namespace Gym_Booking_Manager.Activities
             else Console.WriteLine("Felaktigt input!");
             }
             Reservation Reservationn = Reservation.reservations[Reservation.reservations.Count() - 1];
-            Calendar datee = new Calendar(date[0], date[1]); 
+            Schedule datee = new Schedule(date[0], date[1]); 
             Activity.activities.Add(new Activity(id, Name, Description, Open, participantsNo, Instructor, datee, Reservationn, Participants));
             SaveActivities();
         }
@@ -285,7 +214,7 @@ namespace Gym_Booking_Manager.Activities
                 {
                     list.Add(Reservable.reservables[reservableToList[number - 1]]);
                     Console.WriteLine("You have booked " + Reservable.reservables[reservableToList[number - 1]].name);
-                    Reservation.reservations.Add(new Reservation(Reservation.GetID(), User.users[idStaff], new Calendar(date[0], date[1]), list));
+                    Reservation.reservations.Add(new Reservation(Reservation.GetReservationID(), User.users[idStaff], new Schedule(date[0], date[1]), list));
                     Reservation.SaveReservations();
                     break;
                 }
@@ -294,12 +223,6 @@ namespace Gym_Booking_Manager.Activities
                     Console.WriteLine("Incorrect input!");
                 }
             }
-        }
-        public static int GetID()
-        {
-            int id = activityID;
-            activityID++;
-            return id;
         }
         public void EditActivity()
         {
