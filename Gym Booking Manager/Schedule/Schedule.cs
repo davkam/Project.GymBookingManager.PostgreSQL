@@ -155,7 +155,6 @@ namespace Gym_Booking_Manager.Schedules
                     slotContent = false;
                     foreach (Activity activity in weekActivities)
                     {
-
                         if ((int)activity.date.timeFrom.DayOfWeek == day && activity.date.timeFrom.Hour == t)
                         {
                             if (slotContent) addRows++;
@@ -164,7 +163,20 @@ namespace Gym_Booking_Manager.Schedules
                             if (slotInfo.Length > 14) slotInfo = slotInfo.Substring(0, 11) + "...";
 
                             Console.SetCursorPosition(posX + 8 + (15 * d), posY + addRows);
-                            Console.Write($"{slotInfo,-14}|");
+                            if (activity.limit == activity.participants.Count())
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.Write($"{slotInfo,-14}");
+                                Console.ResetColor();
+                                Console.Write("|");
+                            }
+                            else
+                            {
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.Write($"{slotInfo,-14}");
+                                Console.ResetColor();
+                                Console.Write("|");
+                            }
 
                             slotContent = true;
                         }
