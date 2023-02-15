@@ -55,7 +55,6 @@ namespace Gym_Booking_Manager.Activities
                             participants.Add((Customer)User.users.Find(user => user.id == int.Parse(strB)));
                         }
                     }
-
                     var staff = (Staff)User.users.Find(u => u.id == int.Parse(stringsA[5]));
                     var calendar = new Calendar(DateTime.Parse(stringsA[6]), DateTime.Parse(stringsA[7]));
                     var reservation = Reservation.reservations.Find(r => r.id == int.Parse(stringsA[8]));

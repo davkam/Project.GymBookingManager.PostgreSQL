@@ -180,7 +180,7 @@ namespace Gym_Booking_Manager.Users
 
             return pass;
         }
-        public void RegisterUser()
+        public void RegisterUser() // NYI: ADD LOGGER!
         {
             User user = new Customer();
             Console.Clear();
@@ -274,7 +274,7 @@ namespace Gym_Booking_Manager.Users
 
             Program.logger.LogActivity($"ERROR: RegisterUser() - New account registration unsuccessful.");
         }
-        public void DeregisterUser()
+        public void DeregisterUser() // NYI: ADD LOGGER!
         {
             int userID = -1;
             int userIndex = -1;
@@ -356,7 +356,7 @@ namespace Gym_Booking_Manager.Users
                 Task.Delay(1500).Wait();
             }
         }
-        public void UpdateInfo()
+        public void UpdateInfo() // NYI: ADD LOGGER!
         {
             Console.Clear();
             Console.WriteLine("<< Update Information >>\n");
@@ -433,7 +433,7 @@ namespace Gym_Booking_Manager.Users
             Task.Delay(1500).Wait();
             SaveUsers();
         }
-        public void UpdateLogin()
+        public void UpdateLogin() // NYI: ADD LOGGER!
         {
             Console.Clear();
             Console.WriteLine("<< Update Login >>\n");
@@ -775,7 +775,7 @@ namespace Gym_Booking_Manager.Users
             this.isMember = isMember;
         }
         public Customer() : base() { }
-        public void AddSubscription()
+        public void AddSubscription() // NYI: ADD LOGGER!
         {
             Console.WriteLine($"\n>> Select membership type:\n{"- [1]",-8}One Day membership.\n{"- [2]",-8}One Month membership.\n{"- [3]",-8}One Year membership.\n{"- [ESC]",-8}Cancel, no membership.");
             ConsoleKeyInfo keyPressed = Console.ReadKey(true);
