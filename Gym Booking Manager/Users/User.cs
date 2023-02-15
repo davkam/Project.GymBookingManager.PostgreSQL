@@ -31,7 +31,6 @@ namespace Gym_Booking_Manager.Users
             this.email = email;
             this.loginName = loginName;
             this.loginPass = loginPass;
-
         }
         public User() { }
         public static bool LoginNameCheck(string loginName)
