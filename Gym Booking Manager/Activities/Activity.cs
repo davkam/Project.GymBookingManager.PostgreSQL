@@ -36,48 +36,63 @@ namespace Gym_Booking_Manager.Activities
         }
         public static void LoadActivities()
         {
-            string[] lines = File.ReadAllLines("Activities/Activities.txt");
-            getActivityID = int.Parse(lines[0]);
-
-            for (int i = 1; i < lines.Length; i++) 
+            try
             {
-                string[] stringsA = lines[i].Split(";");
-                string[] stringsB = stringsA[9].Split(",");
+                string[] lines = File.ReadAllLines("Activities/Activities.txt");
+                getActivityID = int.Parse(lines[0]);
 
-                var participants = new List<Customer>();
-
-                foreach (string strB in stringsB)
+                for (int i = 1; i < lines.Length; i++)
                 {
-                    participants.Add((Customer)User.users.Find(user => user.id == int.Parse(strB)));
-                }
+                    string[] stringsA = lines[i].Split(";");
+                    string[] stringsB = stringsA[9].Split(",");
 
-                var staff = (Staff)User.users.Find(u => u.id == int.Parse(stringsA[5]));
-                var calendar = new Calendar(DateTime.Parse(stringsA[6]), DateTime.Parse(stringsA[7]));
-                var reservation = Reservation.reservations.Find(r => r.id == int.Parse(stringsA[8]));
-                var activity = new Activity(int.Parse(stringsA[0]), stringsA[1], stringsA[2], bool.Parse(stringsA[3]), int.Parse(stringsA[4]), staff, calendar, reservation, participants);
-                activities.Add(activity);
+                    var participants = new List<Customer>();
+
+                    if (stringsB.Length > 0)
+                    {
+                        foreach (string strB in stringsB)
+                        {
+                            participants.Add((Customer)User.users.Find(user => user.id == int.Parse(strB)));
+                        }
+                    }
+
+                    var staff = (Staff)User.users.Find(u => u.id == int.Parse(stringsA[5]));
+                    var calendar = new Calendar(DateTime.Parse(stringsA[6]), DateTime.Parse(stringsA[7]));
+                    var reservation = Reservation.reservations.Find(r => r.id == int.Parse(stringsA[8]));
+                    var activity = new Activity(int.Parse(stringsA[0]), stringsA[1], stringsA[2], bool.Parse(stringsA[3]), int.Parse(stringsA[4]), staff, calendar, reservation, participants);
+                    activities.Add(activity);
+                }
+                Program.logger.LogActivity("INFO: LoadActivities() - Read data (\"Activities/Activities.txt\") successful.");
             }
+            catch { Program.logger.LogActivity("ERROR: LoadActivities() - Read data (\"Activities/Activities.txt\") unsuccessful."); }
         }
         public static void SaveActivities()
         {
-            using (StreamWriter writer = new StreamWriter("Activities/Activities.txt", false))
+            try
             {
-                writer.WriteLine(getActivityID);
-                foreach (Activity activity in activities) 
+                using (StreamWriter writer = new StreamWriter("Activities/Activities.txt", false))
                 {
-                    string participants = string.Empty;
-                    foreach (Customer customer in activity.participants)
+                    writer.WriteLine(getActivityID);
+                    foreach (Activity activity in activities)
                     {
-                        participants += $"{customer.id},";
+                        string participants = string.Empty;
+                        if (activity.participants.Count > 0)
+                        {
+                            foreach (Customer customer in activity.participants)
+                            {
+                                participants += $"{customer.id},";
+                            }
+                        }
+                        participants = participants[0..^1];
+                        writer.WriteLine($"{activity.id};{activity.name};{activity.description};{activity.open};{activity.limit};{activity.instructor.id};{activity.date.timeFrom};" +
+                            $"{activity.date.timeTo};{activity.reservation.id};{participants}");
                     }
-                    participants = participants[0..^1];
-                    writer.WriteLine($"{activity.id};{activity.name};{activity.description};{activity.open};{activity.limit};{activity.instructor.id};{activity.date.timeFrom};" +
-                        $"{activity.date.timeTo};{activity.reservation.id};{participants}");
                 }
+                Program.logger.LogActivity("INFO: SaveActivities() - Write data (\"Activities/Activities.txt\") successful.");
             }
+            catch { Program.logger.LogActivity("ERROR: SaveActivities() - Write data (\"Activities/Activities.txt\") unsuccessful."); }
         }
-
-        public static int GetID()
+        private static int GetID()
         {
             int id = getActivityID;
             getActivityID++;

@@ -23,47 +23,57 @@ namespace Gym_Booking_Manager.Reservations
         }
         public static void LoadReservations()
         {
-            string[] lines = File.ReadAllLines("Reservations/Reservations.txt");
-            getReservationID = int.Parse(lines[0]);
-
-            for (int i = 1; i < lines.Length; i++)
+            try
             {
-                string[] stringsA = lines[i].Split(";");
-                string[] stringsB = stringsA[4].Split(",");
+                string[] lines = File.ReadAllLines("Reservations/Reservations.txt");
+                getReservationID = int.Parse(lines[0]);
 
-                var reservables = new List<Reservable>();
-
-                // Adding objects(Reservable) from public list(Reservable.reservables) to list(reservables) based on integers(Reservable.id).
-                foreach (string strB in stringsB)
+                for (int i = 1; i < lines.Length; i++)
                 {
-                    var reservable = Reservable.reservables.Find(r => r.id == int.Parse(strB));
-                    reservables.Add(reservable);
-                }
+                    string[] stringsA = lines[i].Split(";");
+                    string[] stringsB = stringsA[4].Split(",");
 
-                var owner = User.users.Find(u => u.id == int.Parse(stringsA[1]));
-                var date = new Calendar(DateTime.Parse(stringsA[2]), DateTime.Parse(stringsA[3]));
-                var reservation = new Reservation(int.Parse(stringsA[0]), owner, date, reservables);
-                reservations.Add(reservation);
+                    var reservables = new List<Reservable>();
+
+                    // Adding objects(Reservable) from public list(Reservable.reservables) to list(reservables) based on integers(Reservable.id).
+                    foreach (string strB in stringsB)
+                    {
+                        var reservable = Reservable.reservables.Find(r => r.id == int.Parse(strB));
+                        reservables.Add(reservable);
+                    }
+
+                    var owner = User.users.Find(u => u.id == int.Parse(stringsA[1]));
+                    var date = new Calendar(DateTime.Parse(stringsA[2]), DateTime.Parse(stringsA[3]));
+                    var reservation = new Reservation(int.Parse(stringsA[0]), owner, date, reservables);
+                    reservations.Add(reservation);
+                }
+                Program.logger.LogActivity("INFO: LoadReservations() - Read data (\"Reservations/Reservations.txt\") successful.");
             }
+            catch { Program.logger.LogActivity("ERROR: LoadReservations() - Read data (\"Reservations/Reservations.txt\") unsuccessful."); }
         }
         public static void SaveReservations()
         {
-            using (StreamWriter writer = new StreamWriter("Reservations/Reservations.txt", false))
+            try
             {
-                writer.WriteLine(getReservationID);
-                foreach (Reservation rsv in reservations)
+                using (StreamWriter writer = new StreamWriter("Reservations/Reservations.txt", false))
                 {
-                    string reservables = string.Empty;
-                    foreach (Reservable rvb in rsv.reservables)
+                    writer.WriteLine(getReservationID);
+                    foreach (Reservation rsv in reservations)
                     {
-                        reservables += $"{rvb.id},";
+                        string reservables = string.Empty;
+                        foreach (Reservable rvb in rsv.reservables)
+                        {
+                            reservables += $"{rvb.id},";
+                        }
+                        reservables = reservables[0..^1];
+                        writer.WriteLine($"{rsv.id};{rsv.owner.id};{rsv.date.timeFrom};{rsv.date.timeTo};{reservables}");
                     }
-                    reservables = reservables[0..^1];
-                    writer.WriteLine($"{rsv.id};{rsv.owner.id};{rsv.date.timeFrom};{rsv.date.timeTo};{reservables}");
                 }
+                Program.logger.LogActivity("INFO: SaveReservations() - Write data (\"Reservations/Reservations.txt\") successful.");
             }
+            catch { Program.logger.LogActivity("ERROR: SaveReservations() - Write data (\"Reservations/Reservations.txt\") unsuccessful."); }
         }
-        public static int GetID()
+        private static int GetID()
         {
             int id = getReservationID;
             getReservationID++;
@@ -189,54 +199,64 @@ namespace Gym_Booking_Manager.Reservations
         }
         public static void LoadReservables()
         {
-            string[] lines = File.ReadAllLines("Reservations/Reservables.txt");
-            getReservableID = int.Parse(lines[0]);
-
-            for (int i = 1; i < lines.Length; i++)
+            try
             {
-                string[] strings = lines[i].Split(";");
-                if (strings[0] == "Equipment")
+                string[] lines = File.ReadAllLines("Reservations/Reservables.txt");
+                getReservableID = int.Parse(lines[0]);
+
+                for (int i = 1; i < lines.Length; i++)
                 {
-                    var equipment = new Equipment(int.Parse(strings[1]), strings[2], strings[3], bool.Parse(strings[4]));
-                    reservables.Add(equipment);
+                    string[] strings = lines[i].Split(";");
+                    if (strings[0] == "Equipment")
+                    {
+                        var equipment = new Equipment(int.Parse(strings[1]), strings[2], strings[3], bool.Parse(strings[4]));
+                        reservables.Add(equipment);
+                    }
+                    if (strings[0] == "Space")
+                    {
+                        var space = new Space(int.Parse(strings[1]), strings[2], strings[3], int.Parse(strings[4]));
+                        reservables.Add(space);
+                    }
+                    if (strings[0] == "PTrainer")
+                    {
+                        Staff staff = (Staff)User.users.Find(u => u.id == int.Parse(strings[2]));
+                        var ptrainer = new PTrainer(int.Parse(strings[1]), staff);
+                        reservables.Add(ptrainer);
+                    }
                 }
-                if (strings[0] == "Space")
-                {
-                    var space = new Space(int.Parse(strings[1]), strings[2], strings[3], int.Parse(strings[4]));
-                    reservables.Add(space);
-                }
-                if (strings[0] == "PTrainer")
-                {
-                    Staff staff = (Staff)User.users.Find(u => u.id == int.Parse(strings[2]));
-                    var ptrainer = new PTrainer(int.Parse(strings[1]), staff);
-                    reservables.Add(ptrainer);
-                }
+                Program.logger.LogActivity("INFO: LoadReservables() - Read data (\"Reservations/Reservables.txt\") successful.");
             }
+            catch { Program.logger.LogActivity("ERROR: LoadReservables() - Read data (\"Reservations/Reservables.txt\") unsuccessful."); }
         }
         public static void SaveReservables()
         {
-            using (StreamWriter writer = new StreamWriter("Reservations/Reservables.txt", false))
+            try
             {
-                writer.WriteLine(getReservableID);
-                for (int i = 0; i < reservables.Count; i++)
+                using (StreamWriter writer = new StreamWriter("Reservations/Reservables.txt", false))
                 {
-                    if (reservables[i] is Equipment)
+                    writer.WriteLine(getReservableID);
+                    for (int i = 0; i < reservables.Count; i++)
                     {
-                        Equipment equipment = (Equipment)reservables[i];
-                        writer.WriteLine($"Equipment;{equipment.id};{equipment.name};{equipment.description};{equipment.bookable}");
-                    }
-                    if (reservables[i] is Space)
-                    {
-                        Space space = (Space)reservables[i];
-                        writer.WriteLine($"Space;{space.id};{space.name};{space.description};{space.capacity}");
-                    }
-                    if (reservables[i] is PTrainer)
-                    {
-                        PTrainer ptrainer = (PTrainer)reservables[i];
-                        writer.WriteLine($"PTrainer;{ptrainer.id};{ptrainer.name};{ptrainer.description};{ptrainer.instructor.id}");
+                        if (reservables[i] is Equipment)
+                        {
+                            Equipment equipment = (Equipment)reservables[i];
+                            writer.WriteLine($"Equipment;{equipment.id};{equipment.name};{equipment.description};{equipment.bookable}");
+                        }
+                        if (reservables[i] is Space)
+                        {
+                            Space space = (Space)reservables[i];
+                            writer.WriteLine($"Space;{space.id};{space.name};{space.description};{space.capacity}");
+                        }
+                        if (reservables[i] is PTrainer)
+                        {
+                            PTrainer ptrainer = (PTrainer)reservables[i];
+                            writer.WriteLine($"PTrainer;{ptrainer.id};{ptrainer.name};{ptrainer.description};{ptrainer.instructor.id}");
+                        }
                     }
                 }
+                Program.logger.LogActivity("INFO: SaveReservables() - Write data (\"Reservations/Reservables.txt\") successful.");
             }
+            catch { Program.logger.LogActivity("ERROR: SaveReservables() - Write data (\"Reservations/Reservables.txt\") unsuccessful."); }
         }
         public static void NewReservable()
         {
@@ -262,7 +282,7 @@ namespace Gym_Booking_Manager.Reservations
                 }
             }
         }
-        public static int GetID()
+        private static int GetID()
         {
             int id = getReservableID;
             getReservableID++;

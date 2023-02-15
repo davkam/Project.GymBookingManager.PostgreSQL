@@ -1,7 +1,5 @@
+using Gym_Booking_Manager;
 using Gym_Booking_Manager.Reservations;
-using System.Linq;
-using System.Numerics;
-using System.Runtime.CompilerServices;
 
 namespace Gym_Booking_Manager.Users
 {
@@ -11,7 +9,7 @@ namespace Gym_Booking_Manager.Users
         //private const string adminUsername = "admin";
         //private const string adminPassword = "admin123";
 
-        public static int nextUserID;
+        public static int getUserID;
         public static List<User> users = new List<User>();
 
         public int id { get; set; } // TBD: USE GUID?
@@ -34,6 +32,121 @@ namespace Gym_Booking_Manager.Users
             this.loginPass = loginPass;
         }
         public User() { }
+        public static void LoadUsers()
+        {
+            try
+            {
+                string[] lines = File.ReadAllLines("Users/Users.txt");
+                getUserID = int.Parse(lines[0]);
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    string[] strings = lines[i].Split(";");
+                    if (strings[0] == "Admin") users.Add(new Admin(int.Parse(strings[1]), strings[2], strings[3], (strings[4]), strings[5], strings[6], strings[7], strings[8]));
+                    if (strings[0] == "Staff") users.Add(new Staff(int.Parse(strings[1]), strings[2], strings[3], (strings[4]), strings[5], strings[6], strings[7], strings[8]));
+                    if (strings[0] == "Customer") users.Add(new Customer(int.Parse(strings[1]), strings[2], strings[3], (strings[4]), strings[5], strings[6], strings[7], strings[8], DateTime.Parse(strings[9]), DateTime.Parse(strings[10]), bool.Parse(strings[11])));
+                }
+                Program.logger.LogActivity("INFO: LoadUsers() - Read data (\"Users/Users.txt\") successful.");
+            }
+            catch { Program.logger.LogActivity("ERROR: LoadUsers() - Read data (\"Users/Users.txt\") unsuccessful."); }
+        }
+        public static void SaveUsers()
+        {
+            try
+            {
+                using (StreamWriter writer = new StreamWriter("Users/Users.txt", false))
+                {
+                    writer.WriteLine(getUserID);
+                    foreach (User user in users)
+                    {
+                        if (user is Admin)
+                        {
+                            writer.WriteLine($"Admin;{user.id};{user.firstName};{user.lastName};{user.ssn};{user.phone};{user.email};{user.loginName};{user.loginPass}");
+                        }
+                        if (user is Staff)
+                        {
+                            writer.WriteLine($"Staff;{user.id};{user.firstName};{user.lastName};{user.ssn};{user.phone};{user.email};{user.loginName};{user.loginPass}");
+                        }
+                        if (user is Customer)
+                        {
+                            Customer saveUser = (Customer)user;
+                            writer.WriteLine($"Customer;{saveUser.id};{user.firstName};{saveUser.lastName};{saveUser.ssn};{saveUser.phone};{saveUser.email};{saveUser.loginName};{saveUser.loginPass};{saveUser.subStart};{saveUser.subEnd};{saveUser.isMember}");
+                        }
+                    }
+                }
+                Program.logger.LogActivity("INFO: SaveUsers() - Write data (\"Users/Users.txt\") successful.");
+            }
+            catch { Program.logger.LogActivity("ERROR: SaveUsers() - Write data (\"Users/Users.txt\") unsuccessful."); }
+        }
+        private static int GetID()
+        {
+            int id = getUserID;
+            getUserID++;
+            return id;
+        }
+        public static int Login()   // NYI: SYS. ADMIN LOGIN!
+        {
+            int id = -1;
+            int tries = 3;
+            string? loginName = string.Empty;
+
+            try
+            {
+                Console.Clear();
+                Console.WriteLine("<< LOG-IN >>\n");
+                while (id == -1)
+                {
+                    Console.Write(">> Enter username: ");
+                    loginName = Console.ReadLine();
+
+                    foreach (User user in users)
+                    {
+                        if (loginName == user.loginName)
+                        {
+                            id = user.id;
+                        }
+                    }
+                    if (id == -1) Console.WriteLine(">> Username does not exist!");
+                    else Console.Clear();
+                }
+                Program.logger.LogActivity($"INFO: Login() - Username entry successful. USER: {loginName}");
+            }
+            catch { Program.logger.LogActivity($"ERROR: Login() - Username entry unsuccessful. USER: {loginName}"); }
+
+            try
+            {
+                Console.WriteLine("<< LOG-IN >>\n");
+                Console.WriteLine($">> Username: {loginName}");
+                while (true)
+                {
+                    User? user = users.Find(u => u.id == id);
+                    Console.Write(">> Enter password: ");
+                    string loginPass = PasswordInput();
+
+                    if (loginPass == user.loginPass)
+                    {
+                        Console.WriteLine($"\n>> Welcome {user.firstName} {user.lastName}!");
+                        Task.Delay(1000).Wait();
+                        break;
+                    }
+                    else
+                    {
+                        tries--;
+                        Console.WriteLine("\n>> Incorrect password, " + tries + " tries left.");
+                    }
+
+                    if (tries == 0)
+                    {
+                        Console.WriteLine("\n>> Maximum tries reached, contact staff for support.");
+                        Task.Delay(1000).Wait();
+                        return -1;
+                    }
+                }
+                Program.logger.LogActivity($"INFO: Login() - Password entry successful. USER: {loginName}");
+            }
+            catch { Program.logger.LogActivity($"ERROR: Login() - Password entry unsuccessful. USER: {loginName}"); }
+
+            return id;
+        }
         public static bool LoginNameCheck(string loginName)
         {
             foreach (User user in users)
@@ -41,6 +154,207 @@ namespace Gym_Booking_Manager.Users
                 if (loginName == user.loginName) return false;
             }
             return true;
+        }
+        public static string PasswordInput()
+        {
+            ConsoleKeyInfo keyInfo;
+            string pass = string.Empty;
+
+            do
+            {
+                keyInfo = Console.ReadKey(true);
+
+                if (keyInfo.Key == ConsoleKey.Backspace && pass.Length > 0)
+                {
+                    Console.Write("\b \b");
+                    pass = pass[0..^1];
+                }
+                else if (!char.IsControl(keyInfo.KeyChar))
+                {
+                    Console.Write("*");
+                    pass += keyInfo.KeyChar;
+                }
+                else if (keyInfo.Key == ConsoleKey.Escape) break;
+
+            } while (keyInfo.Key != ConsoleKey.Enter);
+
+            return pass;
+        }
+        public void RegisterUser()
+        {
+            User user = new Customer();
+            Console.Clear();
+            Console.WriteLine("<< NEW ACCOUNT REGISTRATION >>\n");
+
+            if (this is Admin)
+            {
+                Console.WriteLine($">> Select account type: \n{"- [1]",-8}New admin account.\n{"- [2]",-8}New staff account.\n{"- [3]",-8}New customer account.");
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) { user = new Admin(); }
+                else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) { user = new Staff(); }
+                else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) { user = new Customer(); }
+                else
+                {
+                    Console.WriteLine($"Invalid key option: ({keyInfo.Key})");
+                    return;
+                }
+            }
+            user.id = GetID();
+            Console.Write(">> Enter first name: ");
+            user.firstName = Console.ReadLine();
+            Console.Write(">> Enter last name: ");
+            user.lastName = Console.ReadLine();
+            Console.Write(">> Enter social security number: ");
+            user.ssn = Console.ReadLine();
+            Console.Write(">> Enter phone number: ");
+            user.phone = Console.ReadLine();
+            Console.Write(">> Enter email address: ");
+            user.email = Console.ReadLine();
+            Console.Write(">> Enter login name: ");
+            user.loginName = Console.ReadLine();
+            while (!LoginNameCheck(user.loginName))
+            {
+                Console.Write(">> Login name unavailable, try again: ");
+                user.loginName = Console.ReadLine();
+            }
+            string loginPassA, loginPassB;
+            do
+            {
+                Console.Write(">> Enter login password: ");
+                loginPassA = PasswordInput();
+                Console.Write("\n>> Confirm password: ");
+                loginPassB = PasswordInput();
+                Console.WriteLine();
+                if (loginPassA != loginPassB) Console.WriteLine(">> Confirm password failed!");
+            } while (loginPassA != loginPassB);
+            user.loginPass = loginPassA;
+
+            if (user is Staff)
+            {
+                Console.WriteLine(">> Add new staff as a personal trainer?");
+                Console.WriteLine($"{"- [Y]",-8}Yes.\n{"- [N]",-8}No.");
+
+                ConsoleKeyInfo keyPressed = Console.ReadKey(true);
+
+                if (keyPressed.Key == ConsoleKey.Y)
+                {
+                    Reservable.NewPT((Staff)user);
+                    Console.WriteLine("\n>> Added new staff as a personal trainer.");
+                }
+                else if (keyPressed.Key == ConsoleKey.N) Console.WriteLine("\n>> New staff not added as a personal trainer.");
+                else Console.WriteLine($"\n>> Invalid key option [{keyPressed.Key}], new staff not added as a personal trainer.");
+            }
+            if (user is Customer)
+            {
+                Customer customer = (Customer)user;
+                Console.WriteLine("\n>> New customer account registered, add a subscription plan?");
+                Console.WriteLine($"{"- [Y]",-8}Yes.\n{"- [N]",-8}No.");
+
+                ConsoleKeyInfo keyPressed = Console.ReadKey(true);
+
+                if (keyPressed.Key == ConsoleKey.Y) customer.AddSubscription();
+                else if (keyPressed.Key == ConsoleKey.N) Console.WriteLine("\n>> No subscription plan added.");
+                else Console.WriteLine($"\n>> Invalid key option [{keyPressed.Key}], no subscription plan added.");
+            }
+
+            Console.WriteLine($"\n>> New account ({user.loginName}) successfully created!");
+            Console.WriteLine($"{"- TYPE:",-14}{user.GetType().Name}");
+            Console.WriteLine($"{"- FIRST NAME:",-14}{user.firstName}");
+            Console.WriteLine($"{"- LAST NAME:",-14}{user.lastName}");
+            Console.WriteLine($"{"- SSN:",-14}{user.ssn}");
+            Console.WriteLine($"{"- PHONENR.:",-14}{user.phone}");
+            Console.WriteLine($"{"- EMAIL:",-14}{user.email}\n");
+            Console.WriteLine("\n>> Press any key to continue.");
+            Console.ReadKey(true);
+
+            users.Add(user);
+            SaveUsers();
+
+            Program.logger.LogActivity($"INFO: RegisterUser() - New account registration successful. USER: {user.loginName}");
+
+            Program.logger.LogActivity($"ERROR: RegisterUser() - New account registration unsuccessful.");
+        }
+        public void DeregisterUser()
+        {
+            int userID = -1;
+            int userIndex = -1;
+            Console.Clear();
+            Console.WriteLine("<< ACCOUNT DEREGISTRATION >>\n");
+            Console.WriteLine($">> Select an option: \n{"- [1]",-8}View users.\n{"- [2]",-8}Search user.\n{"- [ESC]",-8}Exit");
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+            if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1)
+            {
+                Console.WriteLine();
+                this.ViewUsers(false, false);
+                Console.Write("\n>> Enter id of user to deregister: ");
+                try
+                {
+                    userID = int.Parse(Console.ReadLine());
+                }
+                catch
+                {
+                    Console.WriteLine(">> Invalid format, account deregistration cancelled!");
+                    Task.Delay(1500).Wait();
+                    return;
+                }
+            }
+            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2)
+            {
+                try
+                {
+                    userID = this.SearchUser(false, false);
+                }
+                catch
+                {
+                    Console.WriteLine(">> Search users unsuccessful!");
+                    Task.Delay(1500).Wait();
+                    return;
+                }
+            }
+            else if (keyInfo.Key == ConsoleKey.Escape)
+            {
+                Console.WriteLine(">> Account deregistration cancelled!");
+                Task.Delay(1500).Wait();
+                return;
+            }
+            else
+            {
+                Console.WriteLine($">> Invalid key: ({keyInfo.Key})");
+                Task.Delay(1500).Wait();
+                return;
+            }
+
+            for (int i = 0; i < users.Count; i++) if (users[i].id == userID) userIndex = i;
+
+            if (userIndex > 0 && userIndex < users.Count)
+            {
+                Console.WriteLine($">> Deregister account ({users[userIndex].loginName})?");
+                Console.WriteLine($"{"- [Y]",-8}Yes");
+                Console.WriteLine($"{"- [N]",-8}No");
+                Console.WriteLine($"{"- [ESC]",-8}Exit");
+                keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.Y)
+                {
+                    Console.WriteLine($">> User ({users[userIndex].loginName}) deregistration successful!");
+                    users.RemoveAt(userIndex);
+                }
+                else if (keyInfo.Key == ConsoleKey.N || keyInfo.Key == ConsoleKey.Escape)
+                {
+                    Console.WriteLine($">> User ({users[userIndex].loginName}) deregistration cancelled!");
+                    Task.Delay(1500).Wait();
+                }
+                else
+                {
+                    Console.WriteLine($">> Invalid key: ({keyInfo.Key}), deregistration unsuccessful!");
+                    Task.Delay(1500).Wait();
+                }
+                SaveUsers();
+            }
+            else
+            {
+                Console.WriteLine(">> Account deregistration unsuccesful!");
+                Task.Delay(1500).Wait();
+            }
         }
         public void UpdateInfo()
         {
@@ -179,296 +493,6 @@ namespace Gym_Booking_Manager.Users
             Console.WriteLine($"- LOGIN PASS: {loginPass}");
             Console.WriteLine("\n>> Press any key to continue.");
             Console.ReadKey(true);
-        }
-        public static int GetID()
-        {
-            int id = nextUserID;
-            nextUserID++;
-            return id;
-        }
-        public static int LogIn()
-        {
-            int id = -1;
-            int tries = 3;
-            string? loginName = string.Empty;
-
-            Console.Clear();
-            Console.WriteLine("<< LOG-IN >>\n");
-            while (id == -1)
-            {
-                Console.Write(">> Enter username: ");
-                loginName = Console.ReadLine();
-
-                foreach (User user in users)
-                {
-                    if (loginName == user.loginName)
-                    {
-                        id = user.id;
-                    }
-                }
-                if (id == -1) Console.WriteLine(">> Username does not exist!");
-                else Console.Clear();
-            }
-
-            Console.WriteLine("<< LOG-IN >>\n");
-            Console.WriteLine($">> Username: {loginName}");
-            while (true)
-            {
-                User? user = users.Find(u => u.id == id);
-                Console.Write(">> Enter password: ");
-                string loginPass = PasswordInput();
-
-                if (loginPass == user.loginPass)
-                {
-                    Console.WriteLine($"\n>> Welcome {user.firstName} {user.lastName}!");
-                    Task.Delay(1000).Wait();
-                    break;
-                }
-                else
-                {
-                    tries--;
-                    Console.WriteLine("\n>> Incorrect password, " + tries + " tries left.");
-                }
-                if (tries == 0)
-                {
-                    Console.WriteLine("\n>> Maximum tries reached, contact staff for support.");
-                    Task.Delay(1000).Wait();
-                    return -1;
-                }
-            }
-            return id;
-        }
-        public static string PasswordInput()
-        {
-            ConsoleKeyInfo keyInfo;
-            string pass = string.Empty;
-
-            do
-            {
-                keyInfo = Console.ReadKey(true);
-
-                if (keyInfo.Key == ConsoleKey.Backspace && pass.Length > 0)
-                {
-                    Console.Write("\b \b");
-                    pass = pass[0..^1];
-                }
-                else if (!char.IsControl(keyInfo.KeyChar))
-                {
-                    Console.Write("*");
-                    pass += keyInfo.KeyChar;
-                }
-                else if (keyInfo.Key == ConsoleKey.Escape) break;
-
-            } while (keyInfo.Key != ConsoleKey.Enter);
-
-            return pass;
-        }
-        public static void LoadUsers()
-        {
-            string[] lines = File.ReadAllLines("Users/Users.txt");
-            nextUserID = int.Parse(lines[0]);
-            for (int i = 1; i < lines.Length; i++)
-            {
-                string[] strings = lines[i].Split(";");
-                if (strings[0] == "Admin") users.Add(new Admin(int.Parse(strings[1]), strings[2], strings[3], (strings[4]), strings[5], strings[6], strings[7], strings[8]));
-                if (strings[0] == "Staff") users.Add(new Staff(int.Parse(strings[1]), strings[2], strings[3], (strings[4]), strings[5], strings[6], strings[7], strings[8]));
-                if (strings[0] == "Customer") users.Add(new Customer(int.Parse(strings[1]), strings[2], strings[3], (strings[4]), strings[5], strings[6], strings[7], strings[8], DateTime.Parse(strings[9]), DateTime.Parse(strings[10]), bool.Parse(strings[11])));
-            }
-        }
-        public static void SaveUsers()
-        {
-            using (StreamWriter writer = new StreamWriter("Users/Users.txt", false))
-            {
-                writer.WriteLine(nextUserID);
-                foreach (User user in users)
-                {
-                    if (user is Admin)
-                    {
-                        writer.WriteLine($"Admin;{user.id};{user.firstName};{user.lastName};{user.ssn};{user.phone};{user.email};{user.loginName};{user.loginPass}");
-                    }
-                    if (user is Staff)
-                    {
-                        writer.WriteLine($"Staff;{user.id};{user.firstName};{user.lastName};{user.ssn};{user.phone};{user.email};{user.loginName};{user.loginPass}");
-                    }
-                    if (user is Customer)
-                    {
-                        Customer saveUser = (Customer)user;
-                        writer.WriteLine($"Customer;{saveUser.id};{user.firstName};{saveUser.lastName};{saveUser.ssn};{saveUser.phone};{saveUser.email};{saveUser.loginName};{saveUser.loginPass};{saveUser.subStart};{saveUser.subEnd};{saveUser.isMember}");
-                    }
-                }
-            }
-        }
-        public void RegisterUser()
-        {
-            User user = new Customer();
-            Console.Clear();
-            Console.WriteLine("<< NEW ACCOUNT REGISTRATION >>\n");
-
-            if (this is Admin)
-            {
-                Console.WriteLine($">> Select account type: \n{"- [1]",-8}New admin account.\n{"- [2]",-8}New staff account.\n{"- [3]",-8}New customer account.");
-                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-                if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) { user = new Admin(); }
-                else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) { user = new Staff(); }
-                else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) { user = new Customer(); }
-                else
-                {
-                    Console.WriteLine($"Invalid key option: ({keyInfo.Key})");
-                    return;
-                }
-            }
-            user.id = GetID();
-            Console.Write(">> Enter first name: ");
-            user.firstName = Console.ReadLine();
-            Console.Write(">> Enter last name: ");
-            user.lastName = Console.ReadLine();
-            Console.Write(">> Enter social security number: ");
-            user.ssn = Console.ReadLine();
-            Console.Write(">> Enter phone number: ");
-            user.phone = Console.ReadLine();
-            Console.Write(">> Enter email address: ");
-            user.email = Console.ReadLine();
-            Console.Write(">> Enter login name: ");
-            user.loginName = Console.ReadLine();
-            while (!LoginNameCheck(user.loginName))
-            {
-                Console.Write(">> Login name unavailable, try again: ");
-                user.loginName = Console.ReadLine();
-            }
-            string loginPassA, loginPassB;
-            do
-            {
-                Console.Write(">> Enter login password: ");
-                loginPassA = PasswordInput();
-                Console.Write("\n>> Confirm password: ");
-                loginPassB = PasswordInput();
-                Console.WriteLine();
-                if (loginPassA != loginPassB) Console.WriteLine(">> Confirm password failed!");
-            } while (loginPassA != loginPassB);
-            user.loginPass = loginPassA;
-
-            if (user is Staff)
-            {
-                Console.WriteLine(">> Add new staff as a personal trainer?");
-                Console.WriteLine($"{"- [Y]",-8}Yes.\n{"- [N]",-8}No.");
-
-                ConsoleKeyInfo keyPressed = Console.ReadKey(true);
-
-                if (keyPressed.Key == ConsoleKey.Y)
-                {
-                    Reservable.NewPT((Staff)user);
-                    Console.WriteLine("\n>> Added new staff as a personal trainer.");
-                }
-                else if (keyPressed.Key == ConsoleKey.N) Console.WriteLine("\n>> New staff not added as a personal trainer.");
-                else Console.WriteLine($"\n>> Invalid key option [{keyPressed.Key}], new staff not added as a personal trainer.");
-            }
-            if (user is Customer)
-            {
-                Customer customer = (Customer)user;
-                Console.WriteLine("\n>> New customer account registered, add a subscription plan?");
-                Console.WriteLine($"{"- [Y]",-8}Yes.\n{"- [N]",-8}No.");
-
-                ConsoleKeyInfo keyPressed = Console.ReadKey(true);
-
-                if (keyPressed.Key == ConsoleKey.Y) customer.AddSubscription();
-                else if (keyPressed.Key == ConsoleKey.N) Console.WriteLine("\n>> No subscription plan added.");
-                else Console.WriteLine($"\n>> Invalid key option [{keyPressed.Key}], no subscription plan added.");
-            }
-
-            Console.WriteLine($"\n>> New account ({user.loginName}) successfully created!");
-            Console.WriteLine($"{"- TYPE:",-14}{user.GetType().Name}");
-            Console.WriteLine($"{"- FIRST NAME:",-14}{user.firstName}");
-            Console.WriteLine($"{"- LAST NAME:",-14}{user.lastName}");
-            Console.WriteLine($"{"- SSN:",-14}{user.ssn}");
-            Console.WriteLine($"{"- PHONENR.:",-14}{user.phone}");
-            Console.WriteLine($"{"- EMAIL:",-14}{user.email}\n");
-            Console.WriteLine("\n>> Press any key to continue.");
-            Console.ReadKey(true);
-
-            users.Add(user);
-            SaveUsers();
-        }
-        public void DeregisterUser()
-        {
-            int userID = -1;
-            int userIndex = -1;
-            Console.Clear();
-            Console.WriteLine("<< ACCOUNT DEREGISTRATION >>\n");
-            Console.WriteLine($">> Select an option: \n{"- [1]",-8}View users.\n{"- [2]",-8}Search user.\n{"- [ESC]",-8}Exit");
-            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-            if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1)
-            {
-                Console.WriteLine();
-                this.ViewUsers(false, false);
-                Console.Write("\n>> Enter id of user to deregister: ");
-                try
-                {
-                    userID = int.Parse(Console.ReadLine());
-                }
-                catch
-                {
-                    Console.WriteLine(">> Invalid format, account deregistration cancelled!");
-                    Task.Delay(1500).Wait();
-                    return;
-                }
-            }
-            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2)
-            {
-                try
-                {
-                    userID = this.SearchUser(false, false);
-                }
-                catch
-                {
-                    Console.WriteLine(">> Search users unsuccessful!");
-                    Task.Delay(1500).Wait();
-                    return;
-                }
-            }
-            else if (keyInfo.Key == ConsoleKey.Escape)
-            {
-                Console.WriteLine(">> Account deregistration cancelled!");
-                Task.Delay(1500).Wait();
-                return;
-            }
-            else
-            {
-                Console.WriteLine($">> Invalid key: ({keyInfo.Key})");
-                Task.Delay(1500).Wait();
-                return;
-            }
-
-            for (int i = 0; i < users.Count; i++) if (users[i].id == userID) userIndex = i;
-
-            if (userIndex > 0 && userIndex < users.Count)
-            {
-                Console.WriteLine($">> Deregister account ({users[userIndex].loginName})?");
-                Console.WriteLine($"{"- [Y]",-8}Yes");
-                Console.WriteLine($"{"- [N]",-8}No");
-                Console.WriteLine($"{"- [ESC]",-8}Exit");
-                keyInfo = Console.ReadKey(true);
-                if (keyInfo.Key == ConsoleKey.Y)
-                {
-                    Console.WriteLine($">> User ({users[userIndex].loginName}) deregistration successful!");
-                    users.RemoveAt(userIndex);
-                }
-                else if (keyInfo.Key == ConsoleKey.N || keyInfo.Key == ConsoleKey.Escape)
-                {
-                    Console.WriteLine($">> User ({users[userIndex].loginName}) deregistration cancelled!");
-                    Task.Delay(1500).Wait();
-                }
-                else
-                {
-                    Console.WriteLine($">> Invalid key: ({keyInfo.Key}), deregistration unsuccessful!");
-                    Task.Delay(1500).Wait();
-                }
-                SaveUsers();
-            }
-            else
-            {
-                Console.WriteLine(">> Account deregistration unsuccesful!");
-                Task.Delay(1500).Wait();
-            }
         }
         public int SearchUser(bool header = true, bool footer = true)
         {

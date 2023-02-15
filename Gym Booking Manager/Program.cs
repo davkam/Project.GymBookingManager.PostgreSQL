@@ -1,13 +1,15 @@
 ﻿using Gym_Booking_Manager.Users;
 using Gym_Booking_Manager.Activities;
 using Gym_Booking_Manager.Reservations;
-using System.Runtime.InteropServices;
+using Gym_Booking_Manager.Logger;
+using System.ComponentModel;
 
 namespace Gym_Booking_Manager
 {
-
-    internal class Program
+    public class Program
     {
+        // PUBLIC LOGGER INSTANTIATION:
+        public static GBMLogger logger = new GBMLogger("Logger/GBMLogger.txt");
         static void Main(string[] args)
         {
             // LOAD DATA METHODS RUNS BELOW:
@@ -40,14 +42,19 @@ namespace Gym_Booking_Manager
                 }
                 else
                 {
-                    userID = User.LogIn();
+                    userID = User.Login();
                     if (userID != -1)
                     {
                         currentUser = User.users.Find(u => u.id == userID);
                         currentUser.Menu();
-                    }
-                    else Console.WriteLine(">> Login failed!");
 
+                        logger.LogActivity($"INFO: RunGMB() - Login attempt successful. USER: {currentUser.loginName}");
+                    }
+                    else 
+                    { 
+                        Console.WriteLine(">> Login failed!");
+                        logger.LogActivity($"ERROR: RunGMB() - Login attempt unsuccessful.");
+                    }
                 }
             } while (!shutdown);
         }

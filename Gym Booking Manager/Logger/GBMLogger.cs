@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Gym_Booking_Manager.Logger
 {
-    internal class GBMLogger
+    public class GBMLogger
     {
         private readonly string _logFilePath;
         public GBMLogger(string logFilePath)
@@ -15,9 +15,9 @@ namespace Gym_Booking_Manager.Logger
         }
         public void LogActivity(string message)
         {
-            using (StreamWriter sw = File.AppendText(_logFilePath))
+            using (StreamWriter writer = File.AppendText(_logFilePath))
             {
-                sw.WriteLine($"{DateTime.Now} - {message}");
+                writer.WriteLine($"{DateTime.Now} - {message}");
             }
         }
     }
