@@ -34,6 +34,14 @@ namespace Gym_Booking_Manager.Users
 
         }
         public User() { }
+        public static bool LoginNameCheck(string loginName)
+        {
+            foreach (User user in users)
+            {
+                if (loginName == user.loginName) return false;
+            }
+            return true;
+        }
         public void UpdateInfo()
         {
 
@@ -192,6 +200,11 @@ namespace Gym_Booking_Manager.Users
             user.email = Console.ReadLine();
             Console.Write(">> Enter login name: ");
             user.loginName = Console.ReadLine();
+            while (!LoginNameCheck(user.loginName))
+            {
+                Console.Write(">> Login name unavailable, try again: ");
+                user.loginName = Console.ReadLine();
+            }
             string loginPassA, loginPassB;
             do
             {
@@ -602,7 +615,7 @@ namespace Gym_Booking_Manager.Users
                 }
                 else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4)
                 {
-
+                    Reservation.NewReservationStaff(this.id);
                 }
                 else if (keyInfo.Key == ConsoleKey.Escape)
                 {

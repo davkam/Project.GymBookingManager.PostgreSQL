@@ -17,7 +17,7 @@ namespace Gym_Booking_Manager
             Activity.LoadActivities();
 
             // MAIN SOFTWARE LOOP RUNS BELOW:
-            //RunGBM();
+            RunGBM();
         }
         static void RunGBM()
         {
