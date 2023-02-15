@@ -1,6 +1,7 @@
 ﻿using Gym_Booking_Manager.Users;
 using Gym_Booking_Manager.Activities;
 using Gym_Booking_Manager.Reservations;
+using System.Runtime.InteropServices;
 
 namespace Gym_Booking_Manager
 {
@@ -16,7 +17,7 @@ namespace Gym_Booking_Manager
             Activity.LoadActivities();
 
             // MAIN SOFTWARE LOOP RUNS BELOW:
-            RunGBM();
+            //RunGBM();
         }
         static void RunGBM()
         {

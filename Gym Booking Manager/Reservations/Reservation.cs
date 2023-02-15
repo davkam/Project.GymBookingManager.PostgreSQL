@@ -58,6 +58,7 @@ namespace Gym_Booking_Manager.Reservations
                     {
                         reservables += $"{rvb.id},";
                     }
+                    reservables = reservables[0..^1];
                     writer.WriteLine($"{rsv.id};{rsv.owner.id};{rsv.date.timeFrom};{rsv.date.timeTo};{reservables}");
                 }
             }
@@ -167,7 +168,7 @@ namespace Gym_Booking_Manager.Reservations
     }
     public class Reservable
     {
-        public static int reservableID;
+        public static int getReservablesID;
         public static List<Reservable> reservables = new List<Reservable>();
 
         public int id { get; set; }
@@ -183,7 +184,7 @@ namespace Gym_Booking_Manager.Reservations
         public static void LoadReservables()
         {
             string[] lines = File.ReadAllLines("Reservations/Reservables.txt");
-            reservableID = int.Parse(lines[0]);
+            getReservablesID = int.Parse(lines[0]);
 
             for (int i = 1; i < lines.Length; i++)
             {
@@ -210,21 +211,22 @@ namespace Gym_Booking_Manager.Reservations
         {
             using (StreamWriter writer = new StreamWriter("Reservations/Reservables.txt", false))
             {
-                foreach (Reservable r in reservables)
+                writer.WriteLine(getReservablesID);
+                for (int i = 0; i < reservables.Count; i++)
                 {
-                    if (r is Equipment)
+                    if (reservables[i] is Equipment)
                     {
-                        Equipment equipment = (Equipment)r;
+                        Equipment equipment = (Equipment)reservables[i];
                         writer.WriteLine($"Equipment;{equipment.id};{equipment.name};{equipment.description};{equipment.bookable}");
                     }
-                    if (r is Space)
+                    if (reservables[i] is Space)
                     {
-                        Space space = (Space)r;
+                        Space space = (Space)reservables[i];
                         writer.WriteLine($"Space;{space.id};{space.name};{space.description};{space.capacity}");
                     }
-                    if (r is PTrainer)
+                    if (reservables[i] is PTrainer)
                     {
-                        PTrainer ptrainer = (PTrainer)r;
+                        PTrainer ptrainer = (PTrainer)reservables[i];
                         writer.WriteLine($"PTrainer;{ptrainer.id};{ptrainer.name};{ptrainer.description};{ptrainer.instructor.id}");
                     }
                 }
@@ -256,8 +258,8 @@ namespace Gym_Booking_Manager.Reservations
         }
         public static int GetID()
         {
-            int id = reservableID;
-            reservableID++;
+            int id = getReservablesID;
+            getReservablesID++;
             return id;
         }
         public static void NewEquipment()
