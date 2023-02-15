@@ -9,8 +9,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="Users\Users.txt">
+    <None Update="Activities\Activities.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Reservations\Reservables.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Reservations\Reservations.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Users\Users.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
