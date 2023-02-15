@@ -1,5 +1,6 @@
 using Gym_Booking_Manager.Reservations;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Gym_Booking_Manager.Users
@@ -36,11 +37,61 @@ namespace Gym_Booking_Manager.Users
         public User() { }
         public void UpdateInfo()
         {
+            Console.WriteLine("What would you like to update?");
+            Console.WriteLine("- [1] First Name");
+            Console.WriteLine("- [2] Last Name");
+            Console.WriteLine("- [3] Email");
+            Console.WriteLine("- [4] Phone");
 
+            int choice = Convert.ToInt32(Console.ReadLine());
+
+            switch (choice)
+            {
+                case 1:
+                    Console.Write("New First Name: ");
+                    firstName = Console.ReadLine();
+                    break;
+                case 2:
+                    Console.Write("New Last Name: ");
+                    lastName = Console.ReadLine();
+                    break;
+                case 3:
+                    Console.Write("New Email: ");
+                    email = Console.ReadLine();
+                    break;
+                case 4:
+                    Console.Write("New Phone: ");
+                    phone = Console.ReadLine();
+                    break;
+                default:
+                    Console.WriteLine("Invalid choice.");
+                    break;
+            }
+            SaveUsers();
         }
         public void UpdateLogin()
         {
+            Console.WriteLine("What would you like to update?");
+            Console.WriteLine("- [1] Username");
+            Console.WriteLine("- [2] Password");
 
+            int choice = Convert.ToInt32(Console.ReadLine());
+
+            switch (choice)
+            {
+                case 1:
+                    Console.Write("New Username: ");
+                    loginName = Console.ReadLine();
+                    break;
+                case 2:
+                    Console.Write("New Password: ");
+                    loginPass = Console.ReadLine();
+                    break;
+                default:
+                    Console.WriteLine("Invalid choice.");
+                    break;
+            }
+            SaveUsers();
         }
         public static int GetID()
         {
@@ -137,27 +188,6 @@ namespace Gym_Booking_Manager.Users
                 if (strings[0] == "Customer") users.Add(new Customer(int.Parse(strings[1]), strings[2], strings[3], (strings[4]), strings[5], strings[6], strings[7], strings[8], DateTime.Parse(strings[9]), DateTime.Parse(strings[10]), bool.Parse(strings[11])));
             }
         }
-<<<<<<< HEAD
-<<<<<<< HEAD
-        public void SaveUsers(List<User> users)
-        {
-            string[] lines = File.ReadAllLines("Users/Users.txt");
-            int nextLine = lines.Length + 1;
-            using (StreamWriter writer = new StreamWriter("Users/Users.txt", true))
-            {
-                foreach (User user in users)
-                {
-                    writer.WriteLine($"Customer;{GetNextID};{name};{ssn};{phone};{email};{loginName};{loginPass};{DateTime.Now};{MembershipEndDate};True");
-                }
-            }
-=======
-        public void SaveUsers()
-        {
-            string[] lines = File.ReadAllLines("Users/Users.txt");
-            using (StreamWriter writer = new StreamWriter("Users/Users.txt", true))
-            writer.WriteLine($"Customer;{User.users[User.users.Count()-1].id};{User.users[User.users.Count() - 1].name};{User.users[User.users.Count() - 1].ssn};{User.users[User.users.Count() - 1].phone};{User.users[User.users.Count() - 1].email};{User.users[User.users.Count() - 1].loginName};{User.users[User.users.Count() - 1].loginPass};{DateTime.Now};{User.users[User.users.Count() - 1].MembershipEndDate};True");
->>>>>>> origin/mergemain
-=======
         public static void SaveUsers()
         {
             using (StreamWriter writer = new StreamWriter("Users/Users.txt", false))
@@ -278,12 +308,12 @@ namespace Gym_Booking_Manager.Users
                 Console.WriteLine();
                 this.ViewUsers(false, false);
                 Console.Write("\n>> Enter id of user to deregister: ");
-                try 
-                { 
-                    userID = int.Parse(Console.ReadLine()); 
+                try
+                {
+                    userID = int.Parse(Console.ReadLine());
                 }
-                catch 
-                { 
+                catch
+                {
                     Console.WriteLine(">> Invalid format, account deregistration cancelled!");
                     Task.Delay(1500).Wait();
                     return;
@@ -542,75 +572,15 @@ namespace Gym_Booking_Manager.Users
                 Console.WriteLine("\n>> Press any key to continue.");
                 Console.ReadKey(true);
             }
->>>>>>> origin/master
         }
         public abstract void Menu();
     }
     public class Admin : User
     {
-<<<<<<< HEAD
-        public Staff(int id, string name, int ssn, string phone, string email, string loginName, string loginPass)
-            : base(id, name, ssn, phone, email, loginName, loginPass) { }
-<<<<<<< HEAD
-        public void RegisterUser(List<User> users) 
-=======
-        public void RegisterUser()
->>>>>>> origin/mergemain
-        {
-            Console.WriteLine("Enter user name: ");
-            string name = Console.ReadLine();
-            Console.WriteLine("Enter user SSN: ");
-            int ssn = Int32.Parse(Console.ReadLine());
-            Console.WriteLine("Enter user phone: ");
-            string phone = Console.ReadLine();
-            Console.WriteLine("Enter user email: ");
-            string email = Console.ReadLine();
-            Console.WriteLine("Enter user login name: ");
-            string loginName = Console.ReadLine();
-            Console.WriteLine("Enter user login password: ");
-            string loginPass = Console.ReadLine();
-            int id = GetNextID();
-
-            Console.WriteLine("Enter 1 for One Day membership, 2 for One Month membership, 3 for One Year membership:");
-            int membershipChoice = int.Parse(Console.ReadLine());
-            DateTime startDate = DateTime.Now;
-            DateTime membershipDuration;
-            switch (membershipChoice)
-            {
-                case 1:
-                    membershipDuration = DateTime.Now.AddDays(1);
-                    break;
-                case 2:
-                    membershipDuration = DateTime.Now.AddMonths(1);
-                    break;
-                case 3:
-                    membershipDuration = DateTime.Now.AddYears(1);
-                    break;
-                default:
-                    Console.WriteLine("Invalid membership choice. Defaulting to One Day membership.");
-                    membershipDuration = DateTime.Now.AddDays(1);
-                    break;
-            }
-            DateTime MembershipEndDate = membershipDuration;
-            int nextID = GetNextID();
-            Customer customer = new Customer(nextID, name, ssn, phone, email, loginName, loginPass, DateTime.Now, membershipDuration, true);
-            users.Add(customer);
-<<<<<<< HEAD
-            SaveUsers(users);
-=======
-            SaveUsers();
->>>>>>> origin/mergemain
-        }
-        public void UnregisterUser() { }
-        public void ManageAccounts() { }
-        public void CancelActivity() { }
-        public void RegisterReservable() { }
-=======
         public Admin(int id, string firstname, string lastname, string ssn, string phone, string email, string loginName, string loginPass)
             : base(id, firstname, lastname, ssn, phone, email, loginName, loginPass) { }
         public Admin() : base() { }
         public void ListLog() { }
->>>>>>> origin/master
         public override void Menu()
         {
             bool cancel = false;
@@ -625,30 +595,6 @@ namespace Gym_Booking_Manager.Users
 
                 if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1)
                 {
-<<<<<<< HEAD
-                    case "1":
-                        RegisterUser(users);
-                        break;
-                    case "2":
-                        UnregisterUser();
-                        break;
-                    case "3":
-                        ManageAccounts();
-                        break;
-                    case "4":
-                        CancelActivity();
-                        break;
-                    case "5":
-                        RegisterReservable();
-                        break;
-                    case "6":
-                        Console.WriteLine("Hej då!");
-                        go = false;
-                        break;
-                    default:
-                        Console.WriteLine("Felaktigt val!");
-                        break;
-=======
                     this.RegisterUser();
                 }
                 else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2)
@@ -672,7 +618,6 @@ namespace Gym_Booking_Manager.Users
                 else
                 {
                     Console.WriteLine($">> Invalid key option (KEY.{keyInfo.Key})");
->>>>>>> origin/master
                 }
             }
         }
@@ -793,7 +738,7 @@ namespace Gym_Booking_Manager.Users
             while (!cancel)
             {
                 Console.WriteLine("\n>> Select an option!");
-                Console.WriteLine($"{"- [1]",-8}List available activities.\n{"- [2]",-8}Register for an activity.\n{"- [3]",-8}Deregister for an activity.\n{"- [4]",-8}View your registered activities.\n{"- [ESC]",-8}Log out.");
+                Console.WriteLine($"{"- [1]",-8}List available activities.\n{"- [2]",-8}Register for an activity.\n{"- [3]",-8}Deregister for an activity.\n{"- [4]",-8}View your registered activities.\n{"- [5]",-8}Update your personal details.\n{"- [6]",-8}Update your login details.\n{"- [ESC]",-8}Log out.");
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
                 if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1)
@@ -811,6 +756,14 @@ namespace Gym_Booking_Manager.Users
                 else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4)
                 {
                     ListActivity();
+                }
+                else if (keyInfo.Key == ConsoleKey.D5 || keyInfo.Key == ConsoleKey.NumPad5)
+                {
+                    UpdateInfo();
+                }
+                else if (keyInfo.Key == ConsoleKey.D6 || keyInfo.Key == ConsoleKey.NumPad6)
+                {
+                    UpdateLogin();
                 }
                 else if (keyInfo.Key == ConsoleKey.Escape)
                 {

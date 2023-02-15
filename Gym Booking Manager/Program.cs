@@ -10,26 +10,14 @@ namespace Gym_Booking_Manager
     {
         static void Main(string[] args)
         {
-<<<<<<< HEAD
-            int activeUser=-1;
-            User.Load();
-<<<<<<< HEAD
-=======
-            Reservable.Load();
-            Reservation.Load();
-            Activity.Load();            
->>>>>>> origin/mergemain
-            activeUser = User.LogIn();
-            if(activeUser!=-1)User.users[activeUser].Menu();
-=======
             // LOAD DATA METHODS RUNS BELOW:
             User.LoadUsers();
             Reservable.LoadReservables();
             Reservation.LoadReservations();
             Activity.LoadActivities();
 
-            // MAIN SOFTWARE LOOP RUNS BELOW:
-            //RunGBM();
+            //MAIN SOFTWARE LOOP RUNS BELOW:
+            RunGBM();
         }
         static void RunGBM()
         {
@@ -59,10 +47,9 @@ namespace Gym_Booking_Manager
                         currentUser.Menu();
                     }
                     else Console.WriteLine(">> Login failed!");
-                    
+
                 }
             } while (!shutdown);
->>>>>>> origin/master
         }
     }
 }
