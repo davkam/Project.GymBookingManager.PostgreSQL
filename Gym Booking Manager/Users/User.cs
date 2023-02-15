@@ -613,7 +613,6 @@ namespace Gym_Booking_Manager.Users
                 List<User> allUsers = new();
                 allUsers.AddRange(staffUsers);
                 allUsers.AddRange(customerUsers);
-
                 foreach (User u in allUsers)
                 {
                     if (typeUser != u.GetType().Name || x >= 120)
@@ -743,7 +742,7 @@ namespace Gym_Booking_Manager.Users
                     $"\n{"- [ESC]",-8}Log out.");
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
-                if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) Calendars.Calendar.ViewCalendarMenu();
+                if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) RegisterUser(); // Calendars.Calendar.ViewCalendarMenu();
                 else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) RegisterUser();
                 else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) DeregisterUser();
                 else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) ViewUsers();
@@ -751,6 +750,14 @@ namespace Gym_Booking_Manager.Users
                 else if (keyInfo.Key == ConsoleKey.D6 || keyInfo.Key == ConsoleKey.NumPad6) UpdateInfo();
                 else if (keyInfo.Key == ConsoleKey.D7 || keyInfo.Key == ConsoleKey.NumPad7) UpdateLogin();
                 else if (keyInfo.Key == ConsoleKey.D8 || keyInfo.Key == ConsoleKey.NumPad8) ViewInfo();
+                else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4)
+                {
+                    Reservation.NewReservationStaff(this.id);
+                }
+                else if (keyInfo.Key == ConsoleKey.D5 || keyInfo.Key == ConsoleKey.NumPad5)
+                {
+                    Activity.NewActivity(this.id);
+                }
                 else if (keyInfo.Key == ConsoleKey.Escape)
                 {
                     Console.WriteLine($"\n>> LOGGED OUT: {firstName} {lastName}");
@@ -830,18 +837,23 @@ namespace Gym_Booking_Manager.Users
                 Console.WriteLine("<< CUSTOMER MENU >>\n");
                 Console.WriteLine($">> LOGGED IN: {firstName} {lastName}");
                 Console.WriteLine("\n>> Select an option!");
-                Console.WriteLine($"{"- [1]",-8}View activity calendar.\n{"- [2]",-8}Register for an activity.\n{"- [3]",-8}Deregister for an activity." +
-                    $"\n{"- [4]",-8}View your registered activities.\n{"- [5]",-8}Update personal information.\n{"- [6]",-8}Update login details." +
-                    $"\n{"- [7]",-8}View personal information. (INCLUDES LOGIN DETAILS!)\n{"- [ESC]",-8}Log out.");
+                Console.WriteLine($"{"- [1]",-8}View activity calendar.\n{"- [2]",-8}Register for activities.\n{"- [3]",-8}Deregister for activities.\n" +
+                    $"\n{"- [4]",-8}View registered activities.\n{"- [5]",-8}Make reservations.\n{"- [6]",-8}Update personal information." +
+                    $"\n{"- [7]",-8}Update login details.\n{"- [8]",-8}View personal information. (INCLUDES LOGIN DETAILS!)\n{"- [ESC]",-8}Log out.");
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
                 if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) Calendars.Calendar.ViewCalendarMenu();
                 else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) BookActivity();
                 else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) CancelActivity();
                 else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) ListActivity();
-                else if (keyInfo.Key == ConsoleKey.D5 || keyInfo.Key == ConsoleKey.NumPad5) UpdateInfo();
-                else if (keyInfo.Key == ConsoleKey.D6 || keyInfo.Key == ConsoleKey.NumPad6) UpdateLogin();
-                else if (keyInfo.Key == ConsoleKey.D7 || keyInfo.Key == ConsoleKey.NumPad7) ViewInfo();
+                else if (keyInfo.Key == ConsoleKey.D5 || keyInfo.Key == ConsoleKey.NumPad5)
+                {
+                    if (this.isMember == true) Reservation.NewReservationUserMember(this.id);
+                    else Reservation.NewReservationUserNonMember(this.id);
+                }
+                else if (keyInfo.Key == ConsoleKey.D6 || keyInfo.Key == ConsoleKey.NumPad6) UpdateInfo();
+                else if (keyInfo.Key == ConsoleKey.D7 || keyInfo.Key == ConsoleKey.NumPad7) UpdateLogin();
+                else if (keyInfo.Key == ConsoleKey.D8 || keyInfo.Key == ConsoleKey.NumPad8) ViewInfo();
                 else if (keyInfo.Key == ConsoleKey.Escape)
                 {
                     Console.WriteLine($"\n>> LOGGED OUT: {lastName} {lastName}");
