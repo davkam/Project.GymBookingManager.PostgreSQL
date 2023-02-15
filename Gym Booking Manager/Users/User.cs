@@ -1,5 +1,6 @@
 using Gym_Booking_Manager.Reservations;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Gym_Booking_Manager.Users
@@ -43,11 +44,141 @@ namespace Gym_Booking_Manager.Users
         }
         public void UpdateInfo()
         {
+            Console.Clear();
+            Console.WriteLine("<< Update Information >>\n");
+            Console.WriteLine(">> Select an option!");
+            Console.WriteLine("- [1]   First Name.");
+            Console.WriteLine("- [2]   Last Name.");
+            Console.WriteLine("- [3]   Email.");
+            Console.WriteLine("- [4]   Phone.");
+            Console.WriteLine("- [ESC] Exit.");
 
+            string preUpdate, postUpdate;
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+            if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1)
+            {
+                Console.Write(">> New first name: ");
+                postUpdate = Console.ReadLine();
+                preUpdate = firstName;
+                Console.WriteLine($">> Update information from ({preUpdate}) to ({postUpdate})?");
+                Console.WriteLine(">> Press any key to accept, or [ESC] to cancel!");
+
+                keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.Escape) return;
+                else firstName = postUpdate;
+            }
+            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2)
+            {
+                Console.Write(">> New last name: ");
+                postUpdate = Console.ReadLine();
+                preUpdate = lastName;
+                Console.WriteLine($">> Update information from ({preUpdate}) to ({postUpdate})?");
+                Console.WriteLine(">> Press any key to accept, or [ESC] to cancel!");
+
+                keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.Escape) return;
+                else lastName = postUpdate;
+            }
+            else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3)
+            {
+                Console.Write(">> New email: ");
+                postUpdate = Console.ReadLine();
+                preUpdate = email;
+                Console.WriteLine($">> Update information from ({preUpdate}) to ({postUpdate})?");
+                Console.WriteLine(">> Press any key to accept, or [ESC] to cancel!");
+
+                keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.Escape) return;
+                else email = postUpdate;
+            }
+            else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4)
+            {
+                Console.Write(">> New phone: ");
+                postUpdate = Console.ReadLine();
+                preUpdate = phone;
+                Console.WriteLine($">> Update information from ({preUpdate}) to ({postUpdate})?");
+                Console.WriteLine(">> Press any key to accept, or [ESC] to cancel!");
+
+                keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.Escape) return;
+                else phone = postUpdate;
+            }
+            else if (keyInfo.Key == ConsoleKey.Escape)
+            {
+                Console.Write(">> Update login information cancelled!");
+                Task.Delay(1500).Wait();
+                return;
+            }
+            else
+            {
+                Console.WriteLine(">> Invalid option, operation cancelled!");
+                Task.Delay(1500).Wait();
+                return;
+            }
+            Console.WriteLine($">> Update information successful!");
+            Task.Delay(1500).Wait();
+            SaveUsers();
         }
         public void UpdateLogin()
         {
+            Console.Clear();
+            Console.WriteLine("<< Update Login >>\n");
+            Console.WriteLine(">> Select an option!");
+            Console.WriteLine("- [1]   Username.");
+            Console.WriteLine("- [2]   Password.");
+            Console.WriteLine("- [ESC] Exit.");
 
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+            if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1)
+            {
+                Console.Write(">> New login name: ");
+                string newUsername = Console.ReadLine();
+                while (!LoginNameCheck(newUsername))
+                {
+                    Console.Write(">> Login name unavailable, try again: ");
+                    newUsername = Console.ReadLine();
+                }
+
+                loginName = newUsername;
+                Console.WriteLine($">> New login name ({loginName}) successfully updated!");
+            }
+            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2)
+            {
+                string loginPassA, loginPassB;
+                do
+                {
+                    Console.Write(">> New password: ");
+                    loginPassA = PasswordInput();
+                    Console.Write("\n>> Confirm password: ");
+                    loginPassB = PasswordInput();
+                    Console.WriteLine();
+                    if (loginPassA != loginPassB) Console.WriteLine(">> Confirm password failed!");
+                } while (loginPassA != loginPassB);
+
+                loginPass = loginPassA;
+                Console.WriteLine(">> New login password successfully updated!");
+            }
+            else if (keyInfo.Key == ConsoleKey.Escape) Console.Write(">> Update login information cancelled!");
+            else Console.WriteLine(">> Invalid option, operation cancelled!");
+
+            Task.Delay(1500).Wait();
+            SaveUsers();
+        }
+        public void ViewInfo()
+        {
+            Console.Clear();
+            Console.WriteLine("<< VIEW INFORMATION >>\n");
+            Console.WriteLine($"- TYPE:       {GetType().Name}");
+            Console.WriteLine($"- ID:         {id}");
+            Console.WriteLine($"- FIRST NAME: {firstName}");
+            Console.WriteLine($"- LAST NAME:  {lastName}");
+            Console.WriteLine($"- SSN:        {ssn}");
+            Console.WriteLine($"- PHONE.NR:   {phone}");
+            Console.WriteLine($"- EMAIL:      {email}");
+            Console.WriteLine($"- LOGIN NAME: {loginName}");
+            Console.WriteLine($"- LOGIN PASS: {loginPass}");
+            Console.WriteLine("\n>> Press any key to continue.");
+            Console.ReadKey(true);
         }
         public static int GetID()
         {
@@ -212,6 +343,7 @@ namespace Gym_Booking_Manager.Users
                 Console.Write("\n>> Confirm password: ");
                 loginPassB = PasswordInput();
                 Console.WriteLine();
+                if (loginPassA != loginPassB) Console.WriteLine(">> Confirm password failed!");
             } while (loginPassA != loginPassB);
             user.loginPass = loginPassA;
 
@@ -269,12 +401,12 @@ namespace Gym_Booking_Manager.Users
                 Console.WriteLine();
                 this.ViewUsers(false, false);
                 Console.Write("\n>> Enter id of user to deregister: ");
-                try 
-                { 
-                    userID = int.Parse(Console.ReadLine()); 
+                try
+                {
+                    userID = int.Parse(Console.ReadLine());
                 }
-                catch 
-                { 
+                catch
+                {
                     Console.WriteLine(">> Invalid format, account deregistration cancelled!");
                     Task.Delay(1500).Wait();
                     return;
@@ -692,14 +824,15 @@ namespace Gym_Booking_Manager.Users
         public override void Menu()
         {
             bool cancel = false;
-
-            Console.Clear();
-            Console.WriteLine("<< CUSTOMER MENU >>\n");
-            Console.WriteLine($">> LOGGED IN: {this.firstName} {this.lastName}");
             while (!cancel)
             {
+                Console.Clear();
+                Console.WriteLine("<< CUSTOMER MENU >>\n");
+                Console.WriteLine($">> LOGGED IN: {this.firstName} {this.lastName}");
                 Console.WriteLine("\n>> Select an option!");
-                Console.WriteLine($"{"- [1]",-8}List available activities.\n{"- [2]",-8}Register for an activity.\n{"- [3]",-8}Deregister for an activity.\n{"- [4]",-8}View your registered activities.\n{"- [ESC]",-8}Log out.");
+                Console.WriteLine($"{"- [1]",-8}List available activities.\n{"- [2]",-8}Register for an activity.\n{"- [3]",-8}Deregister for an activity." +
+                    $"\n{"- [4]",-8}View your registered activities.\n{"- [5]",-8}Update your personal information.\n{"- [6]",-8}Update your login details." +
+                    $"\n{"- [7]",-8}View your personal information. (INCLUDES LOGIN DETAILS!)\n{"- [ESC]",-8}Log out.");
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
                 if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1)
@@ -717,6 +850,18 @@ namespace Gym_Booking_Manager.Users
                 else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4)
                 {
                     ListActivity();
+                }
+                else if (keyInfo.Key == ConsoleKey.D5 || keyInfo.Key == ConsoleKey.NumPad5)
+                {
+                    UpdateInfo();
+                }
+                else if (keyInfo.Key == ConsoleKey.D6 || keyInfo.Key == ConsoleKey.NumPad6)
+                {
+                    UpdateLogin();
+                }
+                else if (keyInfo.Key == ConsoleKey.D7 || keyInfo.Key == ConsoleKey.NumPad7)
+                {
+                    ViewInfo();
                 }
                 else if (keyInfo.Key == ConsoleKey.Escape)
                 {

@@ -47,7 +47,7 @@ namespace Gym_Booking_Manager
                         currentUser.Menu();
                     }
                     else Console.WriteLine(">> Login failed!");
-                    
+
                 }
             } while (!shutdown);
         }
