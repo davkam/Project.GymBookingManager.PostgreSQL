@@ -1,12 +1,7 @@
 ﻿using Gym_Booking_Manager.Users;
 using Gym_Booking_Manager.Activities;
 using Gym_Booking_Manager.Reservations;
-<<<<<<< HEAD
-using Gym_Booking_Manager.Calendars;
-using System.Globalization;
-using System;
-=======
->>>>>>> origin/master
+using System.Runtime.InteropServices;
 
 namespace Gym_Booking_Manager
 {
@@ -34,7 +29,7 @@ namespace Gym_Booking_Manager
             Activity.LoadActivities();
 
             // MAIN SOFTWARE LOOP RUNS BELOW:
-            RunGBM();
+            //RunGBM();
         }
         static void RunGBM()
         {
