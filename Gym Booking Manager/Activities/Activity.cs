@@ -8,7 +8,7 @@ namespace Gym_Booking_Manager.Activities
 {
     public class Activity
     {
-        public static int activityID;
+        public static int getActivityID;
         public static List<Activity> activities = new List<Activity>();
 
         public int id { get; set; }
@@ -37,7 +37,7 @@ namespace Gym_Booking_Manager.Activities
         public static void LoadActivities()
         {
             string[] lines = File.ReadAllLines("Activities/Activities.txt");
-            activityID = int.Parse(lines[0]);
+            getActivityID = int.Parse(lines[0]);
 
             for (int i = 1; i < lines.Length; i++) 
             {
@@ -46,18 +46,43 @@ namespace Gym_Booking_Manager.Activities
 
                 var participants = new List<Customer>();
 
-                // Adding objects (Customer) from public list (User.users) to new list (participants) based on integers (User.id).
                 foreach (string strB in stringsB)
                 {
                     participants.Add((Customer)User.users.Find(user => user.id == int.Parse(strB)));
                 }
 
-                // Adding new objects (Activity) to public list (Activity.activities) based on values read from file (Activities.txt).
-                activities.Add(new Activity(int.Parse(stringsA[0]), stringsA[1], stringsA[2], bool.Parse(stringsA[3]), int.Parse(stringsA[4]),
-                    (Staff)User.users.Find(u => u.id == int.Parse(stringsA[5])), new Calendar(DateTime.Parse(stringsA[6]), DateTime.Parse(stringsA[7])), Reservation.reservations.Find(r => r.id == int.Parse(stringsA[8])), participants));
+                var staff = (Staff)User.users.Find(u => u.id == int.Parse(stringsA[5]));
+                var calendar = new Calendar(DateTime.Parse(stringsA[6]), DateTime.Parse(stringsA[7]));
+                var reservation = Reservation.reservations.Find(r => r.id == int.Parse(stringsA[8]));
+                var activity = new Activity(int.Parse(stringsA[0]), stringsA[1], stringsA[2], bool.Parse(stringsA[3]), int.Parse(stringsA[4]), staff, calendar, reservation, participants);
+                activities.Add(activity);
+            }
+        }
+        public static void SaveActivities()
+        {
+            using (StreamWriter writer = new StreamWriter("Activities/Activities.txt", false))
+            {
+                writer.WriteLine(getActivityID);
+                foreach (Activity activity in activities) 
+                {
+                    string participants = string.Empty;
+                    foreach (Customer customer in activity.participants)
+                    {
+                        participants += $"{customer.id},";
+                    }
+                    participants = participants[0..^1];
+                    writer.WriteLine($"{activity.id};{activity.name};{activity.description};{activity.open};{activity.limit};{activity.instructor.id};{activity.date.timeFrom};" +
+                        $"{activity.date.timeTo};{activity.reservation.id};{participants}");
+                }
             }
         }
 
+        public static int GetID()
+        {
+            int id = getActivityID;
+            getActivityID++;
+            return id;
+        }
         public void NewActivity()
         {
             // Staff registers new activites.

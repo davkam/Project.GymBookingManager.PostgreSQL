@@ -681,37 +681,22 @@ namespace Gym_Booking_Manager.Users
             {
                 Console.Clear();
                 Console.WriteLine("<< ADMIN MENU >>\n");
-                Console.WriteLine($">> LOGGED IN: {this.firstName} {this.lastName}");
+                Console.WriteLine($">> LOGGED IN: {firstName} {lastName}");
                 Console.WriteLine("\n>> Select an option!");
                 Console.WriteLine($"{"- [1]",-8}Register user.\n{"- [2]",-8}Deregister user.\n{"- [3]",-8}View users.\n{"- [4]",-8}View log activities.\n{"- [ESC]",-8}Log out.");
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
-                if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1)
-                {
-                    this.RegisterUser();
-                }
-                else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2)
-                {
-                    this.DeregisterUser();
-                }
-                else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3)
-                {
-                    this.ViewUsers();
-                }
-                else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4)
-                {
-                    this.ListLog();
-                }
+                if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) RegisterUser();
+                else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) DeregisterUser();
+                else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) ViewUsers();
+                else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) ListLog();
                 else if (keyInfo.Key == ConsoleKey.Escape)
                 {
-                    Console.WriteLine($"\n>> LOGGED OUT: {this.lastName}");
+                    Console.WriteLine($"\n>> LOGGED OUT: {firstName} {lastName}");
                     Task.Delay(1000).Wait();
                     cancel = true;
                 }
-                else
-                {
-                    Console.WriteLine($">> Invalid key option (KEY.{keyInfo.Key})");
-                }
+                else Console.WriteLine($">> Invalid key option (KEY.{keyInfo.Key})");
             }
         }
     }
@@ -727,37 +712,28 @@ namespace Gym_Booking_Manager.Users
             {
                 Console.Clear();
                 Console.WriteLine("<< STAFF MENU >>\n");
-                Console.WriteLine($">> LOGGED IN: {this.firstName} {this.lastName}");
+                Console.WriteLine($">> LOGGED IN: {firstName} {lastName}");
                 Console.WriteLine("\n>> Select an option!");
-                Console.WriteLine($"{"- [1]",-8}Register a new customer.\n{"- [2]",-8}Deregister a current customer.\n{"- [3]",-8}List all customers.\n{"- [4]",-8}(NOT YET IMPLEMENTED)\n{"- [ESC]",-8}Log out.");
+                Console.WriteLine($"{"- [1]",-8}View activity calendar.\n{"- [2]",-8}Register a customer.\n{"- [3]",-8}Deregister a customer.\n{"- [4]",-8}List all customers." +
+                    $"\n{"- [5]",-8}(NOT YET IMPLEMENTED)\n{"- [6]",-8}Update personal information.\n{"- [7]",-8}Update login details.\n{"- [8]",-8}View personal information. (INCLUDES LOGIN DETAILS!)" +
+                    $"\n{"- [ESC]",-8}Log out.");
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
-                if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1)
-                {
-                    this.RegisterUser();
-                }
-                else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2)
-                {
-                    this.DeregisterUser();
-                }
-                else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3)
-                {
-                    this.ViewUsers();
-                }
-                else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4)
-                {
-                    Reservation.NewReservationStaff(this.id);
-                }
+                if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) Calendars.Calendar.ViewCalendarMenu();
+                else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) RegisterUser();
+                else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) DeregisterUser();
+                else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) ViewUsers();
+                else if (keyInfo.Key == ConsoleKey.D5 || keyInfo.Key == ConsoleKey.NumPad5) Reservation.NewReservationStaff(id);
+                else if (keyInfo.Key == ConsoleKey.D6 || keyInfo.Key == ConsoleKey.NumPad6) UpdateInfo();
+                else if (keyInfo.Key == ConsoleKey.D7 || keyInfo.Key == ConsoleKey.NumPad7) UpdateLogin();
+                else if (keyInfo.Key == ConsoleKey.D8 || keyInfo.Key == ConsoleKey.NumPad8) ViewInfo();
                 else if (keyInfo.Key == ConsoleKey.Escape)
                 {
-                    Console.WriteLine($"\n>> LOGGED OUT: {this.lastName}");
+                    Console.WriteLine($"\n>> LOGGED OUT: {firstName} {lastName}");
                     Task.Delay(1000).Wait();
                     cancel = true;
                 }
-                else
-                {
-                    Console.WriteLine($">> Invalid key option (KEY.{keyInfo.Key})");
-                }
+                else Console.WriteLine($">> Invalid key option (KEY.{keyInfo.Key})");
             }
         }
     }
@@ -828,51 +804,27 @@ namespace Gym_Booking_Manager.Users
             {
                 Console.Clear();
                 Console.WriteLine("<< CUSTOMER MENU >>\n");
-                Console.WriteLine($">> LOGGED IN: {this.firstName} {this.lastName}");
+                Console.WriteLine($">> LOGGED IN: {firstName} {lastName}");
                 Console.WriteLine("\n>> Select an option!");
-                Console.WriteLine($"{"- [1]",-8}List available activities.\n{"- [2]",-8}Register for an activity.\n{"- [3]",-8}Deregister for an activity." +
-                    $"\n{"- [4]",-8}View your registered activities.\n{"- [5]",-8}Update your personal information.\n{"- [6]",-8}Update your login details." +
-                    $"\n{"- [7]",-8}View your personal information. (INCLUDES LOGIN DETAILS!)\n{"- [ESC]",-8}Log out.");
+                Console.WriteLine($"{"- [1]",-8}View activity calendar.\n{"- [2]",-8}Register for an activity.\n{"- [3]",-8}Deregister for an activity." +
+                    $"\n{"- [4]",-8}View your registered activities.\n{"- [5]",-8}Update personal information.\n{"- [6]",-8}Update login details." +
+                    $"\n{"- [7]",-8}View personal information. (INCLUDES LOGIN DETAILS!)\n{"- [ESC]",-8}Log out.");
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
-                if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1)
-                {
-                    Calendars.Calendar.ViewCalendarMenu();
-                }
-                else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2)
-                {
-                    BookActivity();
-                }
-                else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3)
-                {
-                    CancelActivity();
-                }
-                else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4)
-                {
-                    ListActivity();
-                }
-                else if (keyInfo.Key == ConsoleKey.D5 || keyInfo.Key == ConsoleKey.NumPad5)
-                {
-                    UpdateInfo();
-                }
-                else if (keyInfo.Key == ConsoleKey.D6 || keyInfo.Key == ConsoleKey.NumPad6)
-                {
-                    UpdateLogin();
-                }
-                else if (keyInfo.Key == ConsoleKey.D7 || keyInfo.Key == ConsoleKey.NumPad7)
-                {
-                    ViewInfo();
-                }
+                if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) Calendars.Calendar.ViewCalendarMenu();
+                else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) BookActivity();
+                else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) CancelActivity();
+                else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) ListActivity();
+                else if (keyInfo.Key == ConsoleKey.D5 || keyInfo.Key == ConsoleKey.NumPad5) UpdateInfo();
+                else if (keyInfo.Key == ConsoleKey.D6 || keyInfo.Key == ConsoleKey.NumPad6) UpdateLogin();
+                else if (keyInfo.Key == ConsoleKey.D7 || keyInfo.Key == ConsoleKey.NumPad7) ViewInfo();
                 else if (keyInfo.Key == ConsoleKey.Escape)
                 {
-                    Console.WriteLine($"\n>> LOGGED OUT: {this.lastName}");
+                    Console.WriteLine($"\n>> LOGGED OUT: {lastName} {lastName}");
                     Task.Delay(1000).Wait();
                     cancel = true;
                 }
-                else
-                {
-                    Console.WriteLine($">> Invalid key option (KEY.{keyInfo.Key})");
-                }
+                else Console.WriteLine($">> Invalid key option (KEY.{keyInfo.Key})");
             }
         }
     }

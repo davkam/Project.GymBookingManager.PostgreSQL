@@ -63,6 +63,12 @@ namespace Gym_Booking_Manager.Reservations
                 }
             }
         }
+        public static int GetID()
+        {
+            int id = getReservationID;
+            getReservationID++;
+            return id;
+        }
         public static void EnterDate(DateTime[] date)
         {
             bool go = true;
@@ -168,7 +174,7 @@ namespace Gym_Booking_Manager.Reservations
     }
     public class Reservable
     {
-        public static int getReservablesID;
+        public static int getReservableID;
         public static List<Reservable> reservables = new List<Reservable>();
 
         public int id { get; set; }
@@ -184,7 +190,7 @@ namespace Gym_Booking_Manager.Reservations
         public static void LoadReservables()
         {
             string[] lines = File.ReadAllLines("Reservations/Reservables.txt");
-            getReservablesID = int.Parse(lines[0]);
+            getReservableID = int.Parse(lines[0]);
 
             for (int i = 1; i < lines.Length; i++)
             {
@@ -211,7 +217,7 @@ namespace Gym_Booking_Manager.Reservations
         {
             using (StreamWriter writer = new StreamWriter("Reservations/Reservables.txt", false))
             {
-                writer.WriteLine(getReservablesID);
+                writer.WriteLine(getReservableID);
                 for (int i = 0; i < reservables.Count; i++)
                 {
                     if (reservables[i] is Equipment)
@@ -258,8 +264,8 @@ namespace Gym_Booking_Manager.Reservations
         }
         public static int GetID()
         {
-            int id = getReservablesID;
-            getReservablesID++;
+            int id = getReservableID;
+            getReservableID++;
             return id;
         }
         public static void NewEquipment()
