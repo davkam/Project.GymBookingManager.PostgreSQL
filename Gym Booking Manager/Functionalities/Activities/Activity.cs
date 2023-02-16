@@ -97,7 +97,8 @@ namespace Gym_Booking_Manager.Activities
             return id;    
         }
         public static void ChooseReservables(int idStaff, DateTime[] date, List<int> reservableToList)
-        {         
+        {
+            int PTcheck = 0;
             while (true)
             {
                 Console.WriteLine("Available Equipment/PT: ");
@@ -105,18 +106,19 @@ namespace Gym_Booking_Manager.Activities
                 {
                     Console.WriteLine($"{i + 1} {Reservable.reservables[reservableToList[i]].name}");
                 }
-                Console.WriteLine("Type in which Equipment/PT you wish to reserve (number) type 0 to quit: ");
+                Console.WriteLine("Type in which Equipment/PT you wish to reserve (number) type 0 to exit when done with selections (you must pick at least on PT): ");
                 string input = Console.ReadLine();
                 bool isNumber;
                 isNumber = int.TryParse(input, out int number);
                 if (isNumber && number > 0 && number < reservableToList.Count() + 1)
                 {
+                    if (Reservable.reservables[reservableToList[number - 1]] is PTrainer) PTcheck++;
                     Reservation.reservations[Reservation.reservations.Count() - 1].reservables.Add(Reservable.reservables[reservableToList[number - 1]]);
                     Console.WriteLine("You have booked " + Reservable.reservables[reservableToList[number - 1]].name);
-                    Reservation.SaveReservations();
                     reservableToList.RemoveAt(number - 1);
                 }
-                else if (number == 0) break;
+                else if (number == 0 && PTcheck > 0) break;
+                else if (number == 0) Console.WriteLine("You must select at least one PT!");
                 else
                 {
                     Console.WriteLine("Incorrect input!");
@@ -187,7 +189,7 @@ namespace Gym_Booking_Manager.Activities
                 {
                     break;
                 }
-            else Console.WriteLine("Felaktigt input!");
+            else Console.WriteLine("Incorrect input!");
             }
             Reservation Reservationn = Reservation.reservations[Reservation.reservations.Count() - 1];
             Schedule datee = new Schedule(date[0], date[1]); 
@@ -197,7 +199,6 @@ namespace Gym_Booking_Manager.Activities
         public static void ChooseSpace(int idStaff, DateTime[] date, List<int> reservableToList)
         {
             List<Reservable> list = new List<Reservable>();
-            Console.WriteLine(reservableToList.Count());
             Console.WriteLine("Available Spaces: ");
             for (int i = 0; i < reservableToList.Count(); i++)
             {
