@@ -12,14 +12,12 @@ namespace Gym_Booking_Manager.Reservables
         public string name { get; set; }
         public string description { get; set; }
         public bool isAvailable { get; set; }
-        public List<Reservation> reservations { get; set; } // NYI!
         public Reservable(int id, string name, string description, bool isAvailable)
         {
             this.id = id;
             this.name = name;
             this.description = description;
             this.isAvailable = isAvailable;
-            reservations = new List<Reservation>();
         }
         public Reservable() { }
         public static void LoadReservables()
@@ -174,7 +172,7 @@ namespace Gym_Booking_Manager.Reservables
             keyInfo = Console.ReadKey(true);
             if (keyInfo.Key == ConsoleKey.Escape)
             {
-                Console.WriteLine(">> New space registration cancelled!");
+                Console.WriteLine(">> New equipment registration cancelled!");
                 Task.Delay(1500).Wait();
                 return;
             }
@@ -660,24 +658,29 @@ namespace Gym_Booking_Manager.Reservables
                     PTrainer ptrainer = (PTrainer)reservable;
                     Console.WriteLine($"- INSTRUCTOR:   {ptrainer.instructor.firstName} {ptrainer.instructor.lastName}");
                 }
-                Console.WriteLine($"- RESERVED FOR: (RESERVATIONS)");
+                Console.WriteLine($"- RESERVED FOR: (RESERVATIONS)\n");
                 (x, y) = Console.GetCursorPosition();
 
-                foreach (Reservation reservation in reservable.reservations)
+                foreach (Reservation reservation in Reservation.reservations)
                 {
-                    if (x > Console.BufferWidth)
+                    if (reservation.reservables.Contains(reservable))
                     {
-                        x = 0;
-                        y++;
-                    }
-                    Console.SetCursorPosition(x, y);
-                    Console.Write($"  .ID:         {reservation.id}");
-                    Console.SetCursorPosition(x, y + 1);
-                    Console.Write($"  .DATE(FROM): {reservation.date.timeFrom}");
-                    Console.SetCursorPosition(x, y + 2);
-                    Console.Write($"  .DATE(TO):   {reservation.date.timeTo}");
+                        if (x > Console.BufferWidth)
+                        {
+                            x = 0;
+                            y++;
+                        }
+                        Console.SetCursorPosition(x, y);
+                        Console.Write($"  .ID:         {reservation.id}");
+                        Console.SetCursorPosition(x, y + 1);
+                        Console.Write($"  .OWNER:      {reservation.owner.firstName} {reservation.owner.lastName}");
+                        Console.SetCursorPosition(x, y + 2);
+                        Console.Write($"  .DATE(FROM): {reservation.date.timeFrom}");
+                        Console.SetCursorPosition(x, y + 3);
+                        Console.Write($"  .DATE(TO):   {reservation.date.timeTo}\n");
 
-                    x += 40;
+                        x += 40;
+                    }
                 }
             }
             else Console.WriteLine(">> Reservable not found, view reservable cancelled!");

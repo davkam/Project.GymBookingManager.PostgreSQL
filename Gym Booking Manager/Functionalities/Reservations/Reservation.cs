@@ -22,6 +22,7 @@ namespace Gym_Booking_Manager.Reservations
             this.date = date;
             this.reservables = reservables;
         }
+        public Reservation() { }
         public static void LoadReservations()
         {
             try
@@ -190,13 +191,77 @@ namespace Gym_Booking_Manager.Reservations
                 }
             }
         }
-        public void UpdateReservation()
+        public static void EditReservation(User user)
         {
-            // Update reservations from list.
+            string[] lines = File.ReadAllLines("Reservations/Reservations.txt");
+            Console.WriteLine("ID  | OwnerID | StartDate            | EndDate              | ReservableID");
+            for (int i = 1; i < lines.Length; i++)
+            {
+                string[] fields = lines[i].Split(';');
+                Console.WriteLine($"{fields[0],-4} {fields[1],8} {fields[2],22} {fields[3],22} {fields[4],14}");
+            }
+            Console.Write("Enter ID of reservation to edit: ");
+            int id = int.Parse(Console.ReadLine());
+            for (int i = 1; i < lines.Length; i++)
+            {
+                string[] fields = lines[i].Split(';');
+                if (int.Parse(fields[0]) == id)
+                {
+                    Console.Write("Enter new start date (MM/DD/YYYY HH:MM:SS AM/PM): ");
+                    string newStartDate = Console.ReadLine();
+                    Console.Write("Enter new end date (MM/DD/YYYY HH:MM:SS AM/PM): ");
+                    string newEndDate = Console.ReadLine();
+                    Console.Write("Enter new reservable ID: ");
+                    int newReservableID = int.Parse(Console.ReadLine());
+
+
+                    fields[2] = newStartDate;
+                    fields[3] = newEndDate;
+                    fields[4] = newReservableID.ToString();
+
+                    lines[i] = string.Join(";", fields);
+
+                    File.WriteAllLines("Reservations/Reservations.txt", lines);
+                    Console.WriteLine("Reservation updated successfully.");
+                    return;
+                }
+                SaveReservations();
+            }
+            Console.WriteLine("Invalid reservation ID.");
         }
         public void DeleteReservation()
         {
             // Delete reservations from list.
+        }
+        public static void ViewReservations(User user)
+        {
+            string filePath = "Reservations/Reservations.txt";
+            if (File.Exists(filePath))
+            {
+                string[] lines = File.ReadAllLines(filePath);
+                if (lines.Length > 1)
+                {
+                    Console.WriteLine("Current Reservations:");
+                    Console.WriteLine("ID\tOwnerID\tStartDate\tEndDate\tReservableID");
+                    foreach (string line in lines.Skip(1))
+                    {
+                        string[] fields = line.Split(';');
+                        if (fields.Length == 5)
+                        {
+                            Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}",
+                                fields[0], fields[1], fields[2], fields[3], fields[4]);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No reservations found.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Reservations file not found.");
+            }
         }
     }
 }

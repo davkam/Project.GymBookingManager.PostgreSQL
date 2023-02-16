@@ -616,10 +616,7 @@ namespace Gym_Booking_Manager.Users
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
             Task.Delay(1000).Wait();
         }
-        public virtual void MainMenu()
-        {
-
-        }
+        public abstract void MainMenu();
     }
     public class Admin : User
     {
