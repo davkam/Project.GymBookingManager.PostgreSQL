@@ -4,69 +4,105 @@ namespace Gym_Booking_Manager.ManagementFunctions
 {
     public class Login
     {
-        public static int UserLogin()   // NYI: SYS. ADMIN LOGIN!
+        public static User UserLogin()   // NYI: SYS. ADMIN LOGIN!
         {
             int id = -1;
             int tries = 3;
             string? loginName = string.Empty;
-
-            try
+            User? user;
+            ConsoleKeyInfo keyInfo;
+            while (true)
             {
                 Console.Clear();
-                Console.WriteLine("<< LOG-IN >>\n");
-                while (id == -1)
-                {
-                    Console.Write(">> Enter username: ");
-                    loginName = Console.ReadLine();
+                Console.WriteLine("<< LOGIN MENU >>\n");
+                Console.WriteLine(">> Select an option!");
+                Console.WriteLine("- [1]   Member Login.");
+                Console.WriteLine("- [2]   Guest Login.");
+                Console.WriteLine("- [ESC] Exit");
 
-                    foreach (User user in User.users)
+                keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1)
+                {
+                    Console.Clear();
+                    Console.WriteLine("<< LOGIN MENU >>");
+                    Console.WriteLine("(Type quit to exit.)");
+                    while (id == -1)
                     {
-                        if (loginName == user.loginName)
+                        Console.Write("\n>> Enter username: ");
+
+                        loginName = Console.ReadLine();
+
+                        if (loginName.ToLower() == "quit") return null;
+
+                        foreach (User u in User.users)
                         {
-                            id = user.id;
+                            if (loginName == u.loginName) id = u.id;
+                        }
+
+                        if (id == -1) Console.WriteLine(">> Username does not exist!");
+                        else Console.Clear();
+                    }
+                    user = User.users.Find(u => u.id == id);
+
+                    Console.Clear();
+                    Console.WriteLine("<< LOGIN MENU >>");
+                    Console.WriteLine("(Type quit to exit.)");
+                    Console.WriteLine($"\n>> Username: {loginName}");
+                    while (true)
+                    {
+                        Console.Write("\n>> Enter password: ");
+                        string loginPass = MaskPassword();
+
+                        if (loginPass.ToLower() == "quit") return null;
+
+                        if (loginPass == user.loginPass)
+                        {
+                            Console.WriteLine($"\n\n>> Welcome {user.firstName} {user.lastName}!");
+                            Program.logger.LogActivity($"INFO: Login() - Login attempt successful. LOGIN USER: {loginName}");
+                            Task.Delay(1500).Wait();
+                            return user;
+                        }
+                        else
+                        {
+                            tries--;
+                            Console.WriteLine("\n>> Incorrect password, " + tries + " tries left.");
+                        }
+
+                        if (tries == 0)
+                        {
+                            Console.WriteLine("\n>> Maximum tries reached, contact staff for support.");
+                            Program.logger.LogActivity($"INFO: Login() - Login attempt unsuccessful. LOGIN USER: {loginName}");
+                            Task.Delay(1000).Wait();
+                            return null;
                         }
                     }
-                    if (id == -1) Console.WriteLine(">> Username does not exist!");
-                    else Console.Clear();
                 }
-                Program.logger.LogActivity($"INFO: Login() - Username entry successful. USER: {loginName}");
-            }
-            catch { Program.logger.LogActivity($"ERROR: Login() - Username entry unsuccessful. USER: {loginName}"); }
-
-            try
-            {
-                Console.WriteLine("<< LOG-IN >>\n");
-                Console.WriteLine($">> Username: {loginName}");
-                while (true)
+                else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2)
                 {
-                    User? user = User.users.Find(u => u.id == id);
-                    Console.Write(">> Enter password: ");
-                    string loginPass = MaskPassword();
+                    Customer guest = new Customer();
+                    guest.firstName = "Guest";
+                    guest.lastName = "Login";
+                    guest.isGuest = true;
 
-                    if (loginPass == user.loginPass)
-                    {
-                        Console.WriteLine($"\n>> Welcome {user.firstName} {user.lastName}!");
-                        Task.Delay(1000).Wait();
-                        break;
-                    }
-                    else
-                    {
-                        tries--;
-                        Console.WriteLine("\n>> Incorrect password, " + tries + " tries left.");
-                    }
+                    Console.WriteLine("\n>> Welcome guest!");
+                    Program.logger.LogActivity($"INFO: Login() - Guest login attempt successful.");
+                    Task.Delay(1500).Wait();
 
-                    if (tries == 0)
-                    {
-                        Console.WriteLine("\n>> Maximum tries reached, contact staff for support.");
-                        Task.Delay(1000).Wait();
-                        return -1;
-                    }
+                    return guest;
                 }
-                Program.logger.LogActivity($"INFO: Login() - Password entry successful. USER: {loginName}");
+                else if (keyInfo.Key == ConsoleKey.Escape)
+                {
+                    Console.WriteLine(">> Login Cancelled!");
+                    Program.logger.LogActivity($"INFO: Login() - Login attempt cancelled.");
+                    Task.Delay(1000).Wait();
+                    return null;
+                }
+                else
+                {
+                    Console.WriteLine(">> Invalid option!");
+                    Task.Delay(1000).Wait();
+                }
             }
-            catch { Program.logger.LogActivity($"ERROR: Login() - Password entry unsuccessful. USER: {loginName}"); }
-
-            return id;
         }
         public static bool CheckLoginName(string loginName)
         {
@@ -101,6 +137,10 @@ namespace Gym_Booking_Manager.ManagementFunctions
 
             return pass;
         }
+    }
+    public class Run
+    {
+        // ADD BACKGROUND METHODS FOR DATE CHECKING!
     }
     public class Date
     {

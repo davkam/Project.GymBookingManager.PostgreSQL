@@ -3,17 +3,18 @@ using Gym_Booking_Manager.ManagementFunctions;
 using Gym_Booking_Manager.Reservables;
 using Gym_Booking_Manager.Reservations;
 using Gym_Booking_Manager.Schedules;
+using System.Threading.Channels;
+using System;
 
 namespace Gym_Booking_Manager.Users
 {
     public abstract class User
     {
-        // NYI: Add system admin rights!
-        //private const string adminUsername = "admin";
-        //private const string adminPassword = "admin123";
-
         public static int getUserID;
         public static List<User> users = new List<User>();
+        protected static int oneDaySubFee = 5;
+        protected static int oneMonthSubFee = 25;
+        protected static int oneYearSubFee = 250;
 
         public int id { get; set; } // TBD: USE GUID?
         public string? firstName { get; set; }
@@ -158,7 +159,7 @@ namespace Gym_Booking_Manager.Users
 
                 ConsoleKeyInfo keyPressed = Console.ReadKey(true);
 
-                if (keyPressed.Key == ConsoleKey.Y) customer.AddSubscription();
+                if (keyPressed.Key == ConsoleKey.Y) customer.AddSubscription(false, false);
                 else if (keyPressed.Key == ConsoleKey.N) Console.WriteLine("\n>> No subscription plan added.");
                 else Console.WriteLine($"\n>> INVALID KEY: [{keyPressed.Key}], no subscription plan added.");
             }
@@ -599,6 +600,7 @@ namespace Gym_Booking_Manager.Users
         protected virtual void ActivityManagerMenu() { }
         protected virtual void ReservationManagerMenu() { }
         protected virtual void ReservableManagerMenu() { }
+        protected virtual void SubscriptionManagerMenu() { }
         protected void AccountManagerMenu()
         {
             Console.Clear();
@@ -717,7 +719,7 @@ namespace Gym_Booking_Manager.Users
             if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) Reservable.NewReservable(this);
             else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) Reservable.DeleteReservable(this);
             else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) Reservable.EditReservable(this);
-            else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) Reservable.ViewReservables();
+            else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) Reservable.ViewAllReservables();
             else if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> Reservable manager cancelled!");
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
             Task.Delay(1000).Wait();
@@ -754,48 +756,105 @@ namespace Gym_Booking_Manager.Users
         public DateTime subStart { get; set; }
         public DateTime subEnd { get; set; }
         public bool isSub { get; set; }
+        public bool isGuest { get; set; }
         public Customer(int id, string firstname, string lastname, string ssn, string phone, string email, string loginName, string loginPass,
-                        DateTime subStart = default(DateTime), DateTime subEnd = default(DateTime), bool isMember = false)
+                        DateTime subStart = default(DateTime), DateTime subEnd = default(DateTime), bool isSub = false)
             : base(id, firstname, lastname, ssn, phone, email, loginName, loginPass)
         {
             this.subStart = subStart;
             this.subEnd = subEnd;
-            this.isSub = isMember;
+            this.isSub = isSub;
+            isGuest = false;
         }
         public Customer() : base() { }
-        public void AddSubscription() // NYI: ADD LOGGER!
+        public void AddSubscription(bool header = true, bool footer = true) // NYI: ADD LOGGER!
         {
-            Console.WriteLine($"\n>> Select membership type:\n{"- [1]",-8}One Day membership.\n{"- [2]",-8}One Month membership.\n{"- [3]",-8}One Year membership.\n{"- [ESC]",-8}Cancel, no membership.");
-            ConsoleKeyInfo keyPressed = Console.ReadKey(true);
-
-            if (keyPressed.Key == ConsoleKey.D1 || keyPressed.Key == ConsoleKey.NumPad1)
+            if (header)
             {
-                if (this.subEnd < DateTime.Now) this.subStart = DateTime.Now.Date;
-                this.subEnd = DateTime.Now.AddDays(1).Date;
-                this.isSub = true;
-
-                Console.WriteLine($"\n>> Successfully added a \"One-Day\" subscription plan to {this.lastName}.");
-                Console.WriteLine($">> New subscription: {this.subStart.Date} - {this.subEnd.Date}");
+                Console.Clear();
+                Console.WriteLine("<< ADD SUBSCRIPTION >>");
             }
-            if (keyPressed.Key == ConsoleKey.D2 || keyPressed.Key == ConsoleKey.NumPad2)
+            Console.WriteLine($"\n>> Select membership type:");
+            Console.WriteLine("- [1]   One-Day membership.");
+            Console.WriteLine("- [2]   One-Month membership.");
+            Console.WriteLine("- [3]   One-Year membership.");
+            Console.WriteLine("- [ESC] Exit.");
+
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+            if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1)
             {
-                if (this.subEnd < DateTime.Now) this.subStart = DateTime.Now.Date;
-                this.subEnd = DateTime.Now.AddMonths(1).Date;
-                this.isSub = true;
+                Console.WriteLine($"\n>> Confirm new day subscription and pay {User.oneDaySubFee} euros?");
+                Console.WriteLine(">> Press any key to accept, or [ESC] to cancel.");
+                keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.Escape)
+                {
+                    Console.WriteLine(">> Add subscription cancelled!");
+                    Task.Delay(1500).Wait();
+                    return;
+                }
 
-                Console.WriteLine($"\n>> Successfully added a \"One-Month\" subscription plan to {this.lastName}.");
-                Console.WriteLine($">> New subscription: {this.subStart.Date} - {this.subEnd.Date}");
+                if (subEnd < DateTime.Now) subStart = DateTime.Now.Date;
+                subEnd = DateTime.Now.AddDays(1).Date;
+                isSub = true;
+
+                Console.WriteLine($">> Successfully added a \"One-Day\" subscription plan to {lastName}.");
+                Console.WriteLine($">> New subscription: {subStart.Date.ToString()[0..^9]} - {subEnd.Date.ToString()[0..^9]}");
             }
-            if (keyPressed.Key == ConsoleKey.D3 || keyPressed.Key == ConsoleKey.NumPad3)
+            if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2)
             {
-                if (this.subEnd < DateTime.Now) this.subStart = DateTime.Now.Date;
-                this.subEnd = DateTime.Now.AddYears(1).Date;
-                this.isSub = true;
+                Console.WriteLine($"\n>> Confirm new month subscription and pay {User.oneMonthSubFee} euros?");
+                Console.WriteLine(">> Press any key to accept, or [ESC] to cancel.");
+                keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.Escape)
+                {
+                    Console.WriteLine(">> Add subscription cancelled!");
+                    Task.Delay(1500).Wait();
+                    return;
+                }
 
-                Console.WriteLine($"\n>> Successfully added a \"One-Year\" subscription plan to {this.lastName}.");
-                Console.WriteLine($">> New subscription: {this.subStart.Date} - {this.subEnd.Date}");
+                if (subEnd < DateTime.Now) subStart = DateTime.Now.Date;
+                subEnd = DateTime.Now.AddMonths(1).Date;
+                isSub = true;
+
+                Console.WriteLine($">> Successfully added a \"One-Month\" subscription plan to {lastName}.");
+                Console.WriteLine($">> New subscription: {subStart.Date.ToString()[0..^9]} - {subEnd.Date.ToString()[0..^9]}");
             }
-            if (keyPressed.Key == ConsoleKey.Escape) Console.WriteLine(">> New subscription cancelled!");
+            if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3)
+            {
+                Console.WriteLine($"\n>> Confirm new subscription and pay {User.oneYearSubFee} euros?");
+                Console.WriteLine(">> Press any key to accept, or [ESC] to cancel.");
+                keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.Escape)
+                {
+                    Console.WriteLine(">> Add subscription cancelled!");
+                    Task.Delay(1500).Wait();
+                    return;
+                }
+
+                if (subEnd < DateTime.Now) subStart = DateTime.Now.Date;
+                subEnd = DateTime.Now.AddYears(1).Date;
+                isSub = true;
+
+                Console.WriteLine($">> Successfully added a \"One-Year\" subscription plan to {firstName} {lastName}.");
+                Console.WriteLine($">> New subscription: {subStart.Date.ToString()[0..^9]} - {subEnd.Date.ToString()[0..^9]}");
+            }
+            if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> New subscription cancelled!");
+            if (footer)
+            {
+                Task.Delay(2000).Wait();
+                SaveUsers();
+            }
+        }
+        private void ViewSubscription()
+        {
+            Console.Clear();
+            Console.WriteLine($"<< VIEW SUBSCRIPTION >>\n");
+            Console.WriteLine($">> {firstName} {lastName}'s subscription:");
+            Console.WriteLine($"- SUBSCRIBED:         {isSub}");
+            Console.WriteLine($"- SUBSCRIPTION START: {subStart.Date.ToString()[0..^9]}");
+            Console.WriteLine($"- SUBSCRIPTION END:   {subEnd.Date.ToString()[0..^9]}");
+            Console.WriteLine("\n>> Press any key to continue.");
+            Console.ReadKey(true);
         }
         protected override void ActivityManagerMenu()
         {
@@ -808,7 +867,7 @@ namespace Gym_Booking_Manager.Users
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
             if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) return;
-            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) return; 
+            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) return;
             else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) Schedule.ViewScheduleMenu();
             else if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> Activity manager cancelled!");
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
@@ -819,40 +878,97 @@ namespace Gym_Booking_Manager.Users
             Console.Clear();
             Console.WriteLine("<< RESERVATION MANAGER >>\n");
             Console.WriteLine("- [1]   Register a reservation.");
-            Console.WriteLine("- [2]   Deregister a reservation. (NYI)");
-            Console.WriteLine("- [3]   View all reservations. (NYI)");
+            Console.WriteLine("- [2]   Deregister a reservation.");
+            Console.WriteLine("- [3]   View all reservations.");
             Console.WriteLine("- [ESC] Exit.");
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
             if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) Reservation.NewReservation(this);
-            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) return; // NYI: Reservation.RegisterReservation;
-            else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) return; // NYI: Reservation.ViewReservations.
+            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) Reservation.DeleteReservation(this);
+            else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) Reservation.ViewReservations(this);
             else if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> Reservation manager cancelled!");
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
             Task.Delay(1000).Wait();
         }
+        protected override void SubscriptionManagerMenu()
+        {
+            Console.Clear();
+            Console.WriteLine("<< SUBSCRIPTION MENU >>\n");
+            Console.WriteLine($">> LOGGED IN: {firstName} {lastName}");
+            Console.WriteLine("\n>> Select an option!");
+            Console.WriteLine($"{"- [1]",-8}Add subscription.\n{"- [2]",-8}View subscription.\n{"- [ESC]",-8}Log out.");
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+
+            if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) AddSubscription();
+            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) ViewSubscription();
+            else if (keyInfo.Key == ConsoleKey.Escape)
+            {
+                Console.WriteLine($">> View subscription cancelled!");
+                Task.Delay(1500).Wait();
+                return;
+            }
+            else
+            {
+                Console.WriteLine($">> INVALID KEY: [KEY.{keyInfo.Key}], view subscription cancelled!");
+                Task.Delay(1500).Wait();
+                return;
+            }
+        }
         public override void MainMenu()
         {
             bool cancel = false;
-            while (!cancel)
+            if (!isGuest)
             {
-                Console.Clear();
-                Console.WriteLine("<< CUSTOMER MENU >>\n");
-                Console.WriteLine($">> LOGGED IN: {firstName} {lastName}");
-                Console.WriteLine("\n>> Select an option!");
-                Console.WriteLine($"{"- [1]",-8}Manage activities.\n{"- [2]",-8}Manage reservations.\n{"- [3]",-8}Manage account.\n{"- [ESC]",-8}Log out.");
-                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-
-                if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) ActivityManagerMenu();
-                else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) ReservationManagerMenu();
-                else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) AccountManagerMenu();
-                else if (keyInfo.Key == ConsoleKey.Escape)
+                while (!cancel)
                 {
-                    Console.WriteLine($"\n>> LOGGED OUT: {firstName} {lastName}");
-                    Task.Delay(1000).Wait();
-                    cancel = true;
+                    Console.Clear();
+                    Console.WriteLine("<< CUSTOMER MENU >>\n");
+                    Console.WriteLine($">> LOGGED IN: {firstName} {lastName}");
+                    Console.WriteLine("\n>> Select an option!");
+                    Console.WriteLine($"{"- [1]",-8}Manage activities.\n{"- [2]",-8}Manage reservations.\n{"- [3]",-8}Manage subscription.\n{"- [4]",-8}Manage account.\n{"- [ESC]",-8}Log out.");
+                    ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+
+                    if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1)
+                    {
+                        if (isSub) ActivityManagerMenu();
+                        else
+                        {
+                            Console.WriteLine(">> User not subscribed, or subscription has ended.");
+                            Task.Delay(1500).Wait();
+                        }
+                    }
+                    else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) ReservationManagerMenu();
+                    else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) SubscriptionManagerMenu();
+                    else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) AccountManagerMenu();
+                    else if (keyInfo.Key == ConsoleKey.Escape)
+                    {
+                        Console.WriteLine($"\n>> LOGGED OUT: {firstName} {lastName}");
+                        Task.Delay(1000).Wait();
+                        cancel = true;
+                    }
+                    else Console.WriteLine($">> INVALID KEY: [KEY.{keyInfo.Key}]");
                 }
-                else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
+            }
+            else
+            {
+                while (!cancel)
+                {
+                    Console.Clear();
+                    Console.WriteLine("<< GUEST MENU >>\n");
+                    Console.WriteLine(">> Select an option!");
+                    Console.WriteLine($"{"- [1]",-8}View activities.\n{"- [2]",-8}View reservables.\n{"- [ESC]",-8}Log out.");
+                    ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+
+                    if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) ; //NYI
+                    else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) ; //NYI
+                    else if (keyInfo.Key == ConsoleKey.Escape)
+                    {
+                        Console.WriteLine($"\n>> LOGGED OUT GUEST!");
+                        Task.Delay(1000).Wait();
+                        cancel = true;
+                    }
+                    else Console.WriteLine($">> INVALID KEY: [KEY.{keyInfo.Key}]");
+                }
             }
         }
     }

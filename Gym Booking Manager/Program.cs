@@ -42,17 +42,10 @@ namespace Gym_Booking_Manager
                 }
                 else
                 {
-                    userID = Login.UserLogin();
-                    if (userID != -1)
-                    {
-                        currentUser = User.users.Find(u => u.id == userID);
-                        currentUser.MainMenu();
-                    }
-                    else 
-                    { 
-                        Console.WriteLine(">> Login failed!");
-                        logger.LogActivity($"ERROR: RunGMB() - Login attempt unsuccessful.");
-                    }
+                    var user = Login.UserLogin();
+
+                    if (user != null) user.MainMenu();
+                    else { logger.LogActivity($"ERROR: RunGMB() - Login attempt unsuccessful."); }
                 }
             } while (!shutdown);
         }

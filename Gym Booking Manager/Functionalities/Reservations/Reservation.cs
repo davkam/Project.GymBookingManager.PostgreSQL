@@ -14,11 +14,10 @@ namespace Gym_Booking_Manager.Reservations
         public Schedule date { get; set; }
         public List<Reservable>? reservables { get; set; }
 
-        public Reservation(int id, User owner, Schedule date, List<Reservable>? reservables = default)
+        public Reservation(int id, User owner, Schedule date, List<Reservable>? reservables = default(List<Reservable>))
         {
             this.id = id;
             this.owner = owner;
-            this.reservables = new List<Reservable>();
             this.date = date;
             this.reservables = reservables;
         }
@@ -81,8 +80,12 @@ namespace Gym_Booking_Manager.Reservations
             getReservationID++;
             return id;
         }
-        public static void NewReservation(User user)
+        public static void NewReservation(User user)    // NYI: LOG ACTIVITY!
         {
+            Console.Clear();
+            Console.WriteLine("<< NEW RESERVATION >>\n");
+            Console.WriteLine(">> Select an available reservable:");
+
             if (user is Staff) NewReservationStaff(user.id);
             else
             {
@@ -111,7 +114,7 @@ namespace Gym_Booking_Manager.Reservations
                 }
                 if (!overlap) reservableToList.Add(Reservable.reservables[i].id);
             }
-            ChooseReservation(reservableToList, userID, date);
+            SelectReservation(reservableToList, userID, date);
         }
         private static void NewReservationUserMember(int userID)
         {
@@ -133,7 +136,7 @@ namespace Gym_Booking_Manager.Reservations
                 }
                 if (!overlap && Reservable.reservables[i] is not Space) ReservableToList.Add(Reservable.reservables[i].id);
             }
-            ChooseReservation(ReservableToList, userID, date);
+            SelectReservation(ReservableToList, userID, date);
         }
         private static void NewReservationUserNonMember(int userID)
         {
@@ -160,9 +163,9 @@ namespace Gym_Booking_Manager.Reservations
                     if (equipment.membersOnly == true) ReservableToList.Add(Reservable.reservables[i].id);
                 }
             }
-            ChooseReservation(ReservableToList, userID, date);
+            SelectReservation(ReservableToList, userID, date);
         }
-        private static void ChooseReservation(List<int> ReservableToList, int userID, DateTime[] date)
+        private static void SelectReservation(List<int> ReservableToList, int userID, DateTime[] date)
         {
             List<Reservable> list = new List<Reservable>();
             Console.WriteLine("Available Equipment: ");
@@ -191,76 +194,91 @@ namespace Gym_Booking_Manager.Reservations
                 }
             }
         }
-        public static void EditReservation(User user)
+        public static void EditReservation(User user)   // NYI: LOG ACTIVITY!
         {
-            string[] lines = File.ReadAllLines("Reservations/Reservations.txt");
-            Console.WriteLine("ID  | OwnerID | StartDate            | EndDate              | ReservableID");
-            for (int i = 1; i < lines.Length; i++)
-            {
-                string[] fields = lines[i].Split(';');
-                Console.WriteLine($"{fields[0],-4} {fields[1],8} {fields[2],22} {fields[3],22} {fields[4],14}");
+            // NYI!!
+        }
+        public static void DeleteReservation(User user) // NYI: LOG ACTIVITY!
+        {
+            Reservation? reservation;
+            int inputID = -1;
+            
+            Console.Clear();
+            Console.WriteLine("<< DELETE RESERVATION >>\n");
+            Console.WriteLine($">> {user.firstName} {user.lastName}'s reservations:\n");
+
+            ViewReservations(user, false, false);
+
+            Console.Write("\n>> Enter ID of reservation to delete: ");
+            try { inputID = int.Parse(Console.ReadLine()); }
+            catch 
+            { 
+                Console.WriteLine(">> Invalid format, delete reservations cancelled!");
+                Task.Delay(1500).Wait();
+                return;
             }
-            Console.Write("Enter ID of reservation to edit: ");
-            int id = int.Parse(Console.ReadLine());
-            for (int i = 1; i < lines.Length; i++)
+
+            if (inputID > 0) { reservation = reservations.Find(r => r.id == inputID); }
+            else
             {
-                string[] fields = lines[i].Split(';');
-                if (int.Parse(fields[0]) == id)
+                Console.WriteLine(">> Input ID out of range, delete reservations cancelled!");
+                Task.Delay(1500).Wait();
+                return;
+            }
+
+            if (reservation != null && reservation.owner == user)
+            {
+                Console.WriteLine($">> Delete reservation ID.{reservation.id}?");
+                Console.WriteLine(">> Press any key to accept, or [ESC] to cancel!");
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.Escape)
                 {
-                    Console.Write("Enter new start date (MM/DD/YYYY HH:MM:SS AM/PM): ");
-                    string newStartDate = Console.ReadLine();
-                    Console.Write("Enter new end date (MM/DD/YYYY HH:MM:SS AM/PM): ");
-                    string newEndDate = Console.ReadLine();
-                    Console.Write("Enter new reservable ID: ");
-                    int newReservableID = int.Parse(Console.ReadLine());
-
-
-                    fields[2] = newStartDate;
-                    fields[3] = newEndDate;
-                    fields[4] = newReservableID.ToString();
-
-                    lines[i] = string.Join(";", fields);
-
-                    File.WriteAllLines("Reservations/Reservations.txt", lines);
-                    Console.WriteLine("Reservation updated successfully.");
+                    Console.WriteLine(">> Delete reservation cancelled!");
+                    Task.Delay(1500).Wait();
                     return;
                 }
-                SaveReservations();
-            }
-            Console.WriteLine("Invalid reservation ID.");
-        }
-        public void DeleteReservation()
-        {
-            // Delete reservations from list.
-        }
-        public static void ViewReservations(User user)
-        {
-            string filePath = "Reservations/Reservations.txt";
-            if (File.Exists(filePath))
-            {
-                string[] lines = File.ReadAllLines(filePath);
-                if (lines.Length > 1)
-                {
-                    Console.WriteLine("Current Reservations:");
-                    Console.WriteLine("ID\tOwnerID\tStartDate\tEndDate\tReservableID");
-                    foreach (string line in lines.Skip(1))
-                    {
-                        string[] fields = line.Split(';');
-                        if (fields.Length == 5)
-                        {
-                            Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}",
-                                fields[0], fields[1], fields[2], fields[3], fields[4]);
-                        }
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("No reservations found.");
-                }
+                reservations.Remove(reservation);
+                Console.WriteLine(">> Reservation successfully deleted!");
+                Task.Delay(1000).Wait();
             }
             else
             {
-                Console.WriteLine("Reservations file not found.");
+                Console.WriteLine(">> Reservation not found or it has another owner, delete reservations cancelled!");
+                Task.Delay(1500).Wait();
+                return;
+            }
+            SaveReservations();
+        }
+        public static void ViewReservations(User user, bool header = true, bool footer = true)
+        {
+            if (header)
+            {
+                Console.Clear();
+                Console.WriteLine("<< VIEW RESERVATIONS >>\n");
+                Console.WriteLine($">> {user.firstName} {user.lastName}'s reservations:\n");
+            }
+            foreach (Reservation rsv in reservations)
+            {
+                if (rsv.owner == user)
+                {
+                    Console.WriteLine($"- ID:         {rsv.id}");
+                    Console.WriteLine($"- OWNER:      {rsv.owner.firstName} {rsv.owner.lastName}");
+                    Console.WriteLine($"- DATE(FROM): {rsv.date.timeFrom.Date}");
+                    Console.WriteLine($"- DATE(TO):   {rsv.date.timeTo.Date}");
+                    Console.WriteLine($"- RESERVABLES:");
+
+                    foreach (Reservable rsvb in rsv.reservables)
+                    {
+                        Console.WriteLine($"   .ID           {rsvb.id}");
+                        Console.WriteLine($"   .NAME:        {rsvb.name}");
+                        Console.WriteLine($"   .DESCRIPTION: {rsvb.description}");
+                    }
+                }
+            }
+            if (footer)
+            {
+                Console.WriteLine("\n>> Press any key to continue.");
+                Console.ReadKey(true);
             }
         }
     }

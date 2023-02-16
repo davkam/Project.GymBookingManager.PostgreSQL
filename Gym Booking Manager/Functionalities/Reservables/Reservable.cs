@@ -329,12 +329,17 @@ namespace Gym_Booking_Manager.Reservables
             Console.Clear();
             Console.WriteLine("<< DELETE RESERVABLE >>\n");
 
-            ViewReservables(false, false);
+            ViewAllReservables(false, false);
 
             int input = -1;
             Console.Write("\n>> Enter ID of the reservable to delete: ");
             try { input = int.Parse(Console.ReadLine()); }
-            catch { /* NYI: ADD LOGGER */ }
+            catch 
+            {
+                Console.WriteLine(">> Invalid format, delete reservable cancelled!");
+                Task.Delay(1500).Wait();
+                return;
+            }
 
             int index = -1;
             for (int i = 0; i < reservables.Count; i++)
@@ -360,7 +365,7 @@ namespace Gym_Booking_Manager.Reservables
                 Console.WriteLine(">> Reservable successfully deleted.");
                 SaveReservables();
             }
-            else Console.WriteLine(">> Could not find reservable or reservable is used in a reservation, try again!");
+            else Console.WriteLine(">> Reservable not found or reservable is registered in a reservation, try again!");
             Task.Delay(1500).Wait();
         }
         private static bool CheckReservableInReservations(Reservable reservable)
@@ -377,7 +382,7 @@ namespace Gym_Booking_Manager.Reservables
             Console.Clear();
             Console.WriteLine($"{"<< EDIT RESERVABLE >>",64}\n");
 
-            ViewReservables(false, false);
+            ViewAllReservables(false, false);
 
             Console.Write("\n>> Enter ID of the reservable to edit: ");
             try { inputID = int.Parse(Console.ReadLine()); }
@@ -569,10 +574,12 @@ namespace Gym_Booking_Manager.Reservables
             Console.WriteLine("\n>> NOT YET IMPLEMENTED!");
             Task.Delay(1500).Wait();
         }
-        public static void ViewReservables(bool header = true, bool footer = true)
+        public static void ViewAvailableReservables()
         {
-            reservables.Sort((x, y) => x.GetType().Name.CompareTo(y.GetType().Name));
 
+        }
+        public static void ViewAllReservables(bool header = true, bool footer = true)
+        {
             string typeReservable = "Equipment";
             int x, y;
 
@@ -581,8 +588,9 @@ namespace Gym_Booking_Manager.Reservables
                 Console.Clear();
                 Console.WriteLine($"{"<< VIEW RESERVABLES >>",64}\n");
             }
-
+            reservables.Sort((x, y) => x.GetType().Name.CompareTo(y.GetType().Name));
             (x, y) = Console.GetCursorPosition();
+
             foreach (Reservable rsvb in reservables)
             {
                 if (typeReservable != rsvb.GetType().Name || x >= 120)
