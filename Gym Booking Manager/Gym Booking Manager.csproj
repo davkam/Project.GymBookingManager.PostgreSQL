@@ -9,16 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="Activities\Activities.txt">
+    <None Update="Functionalities\Activities\Activities.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Logger\GBMLogger.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Reservables\Reservables.txt">
+    <None Update="Functionalities\Reservables\Reservables.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Reservations\Reservations.txt">
+    <None Update="Functionalities\Reservations\Reservations.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Users\Users.txt">

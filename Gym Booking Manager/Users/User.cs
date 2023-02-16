@@ -1,4 +1,5 @@
 using Gym_Booking_Manager.Activities;
+using Gym_Booking_Manager.ManagementFunctions;
 using Gym_Booking_Manager.Reservables;
 using Gym_Booking_Manager.Reservations;
 using Gym_Booking_Manager.Schedules;
@@ -117,7 +118,7 @@ namespace Gym_Booking_Manager.Users
             user.email = Console.ReadLine();
             Console.Write(">> Enter login name: ");
             user.loginName = Console.ReadLine();
-            while (!CheckLoginName(user.loginName))
+            while (!Login.CheckLoginName(user.loginName))
             {
                 Console.Write(">> Login name unavailable, try again: ");
                 user.loginName = Console.ReadLine();
@@ -126,9 +127,9 @@ namespace Gym_Booking_Manager.Users
             do
             {
                 Console.Write(">> Enter login password: ");
-                loginPassA = MaskPassword();
+                loginPassA = Login.MaskPassword();
                 Console.Write("\n>> Confirm password: ");
-                loginPassB = MaskPassword();
+                loginPassB = Login.MaskPassword();
                 Console.WriteLine();
                 if (loginPassA != loginPassB) Console.WriteLine(">> Confirm password failed!");
             } while (loginPassA != loginPassB);
@@ -352,7 +353,7 @@ namespace Gym_Booking_Manager.Users
             {
                 Console.Write(">> New login name: ");
                 string newUsername = Console.ReadLine();
-                while (!CheckLoginName(newUsername))
+                while (!Login.CheckLoginName(newUsername))
                 {
                     Console.Write(">> Login name unavailable, try again: ");
                     newUsername = Console.ReadLine();
@@ -367,9 +368,9 @@ namespace Gym_Booking_Manager.Users
                 do
                 {
                     Console.Write(">> New password: ");
-                    loginPassA = MaskPassword();
+                    loginPassA = Login.MaskPassword();
                     Console.Write("\n>> Confirm password: ");
-                    loginPassB = MaskPassword();
+                    loginPassB = Login.MaskPassword();
                     Console.WriteLine();
                     if (loginPassA != loginPassB) Console.WriteLine(">> Confirm password failed!");
                 } while (loginPassA != loginPassB);

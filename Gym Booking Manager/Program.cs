@@ -1,8 +1,8 @@
 ﻿using Gym_Booking_Manager.Activities;
-using Gym_Booking_Manager.Logger;
-using Gym_Booking_Manager.ManagementFunctions;
 using Gym_Booking_Manager.Reservables;
 using Gym_Booking_Manager.Reservations;
+using Gym_Booking_Manager.Logger;
+using Gym_Booking_Manager.ManagementFunctions;
 using Gym_Booking_Manager.Users;
 
 namespace Gym_Booking_Manager
@@ -42,7 +42,7 @@ namespace Gym_Booking_Manager
                 }
                 else
                 {
-                    userID = Management.UserLogin();
+                    userID = Login.UserLogin();
                     if (userID != -1)
                     {
                         currentUser = User.users.Find(u => u.id == userID);
