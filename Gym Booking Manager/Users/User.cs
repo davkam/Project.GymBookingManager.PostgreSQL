@@ -706,13 +706,13 @@ namespace Gym_Booking_Manager.Users
             Console.Clear();
             Console.WriteLine("<< ACTIVITY MANAGER >>\n");
             Console.WriteLine("- [1]   Register an activity.");
-            Console.WriteLine("- [2]   Deregister an activity. (NYI)");
+            Console.WriteLine("- [2]   Deregister an activity.");
             Console.WriteLine("- [3]   View all activities.");
             Console.WriteLine("- [ESC] Exit.");
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
             if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) Activity.NewActivity(this.id);
-            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) return; // NYI: Activity.DeregisterActivity
+            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) Activity.DeleteActivity();
             else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) Schedule.ViewScheduleMenu(this.id);
             else if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> Activity manager cancelled!");
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
@@ -798,12 +798,12 @@ namespace Gym_Booking_Manager.Users
             Console.WriteLine("<< ACTIVITY MANAGER >>\n");
             if(this.isMember==false)Console.WriteLine("- [1]   View all activities.");
             if (this.isMember == true) Console.WriteLine("- [1]   View and register for all activities.");
-            Console.WriteLine("- [2]   Deregister for an activity.(NYI)");
+            Console.WriteLine("- [2]   Deregister for an activity.");
             Console.WriteLine("- [ESC] Exit.");
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
-            if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) Schedule.ViewScheduleMenu(this.id);
-            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) return;
+            if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) Activity.ActivityView(this.id);
+            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) Activity.ActivityCancel(this.id);
             else if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> Activity manager cancelled!");
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
             Task.Delay(1000).Wait();

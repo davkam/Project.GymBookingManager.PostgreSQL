@@ -83,7 +83,7 @@ namespace Gym_Booking_Manager.Schedules
                         }
                         break;
                     case ConsoleKey.B:
-                        BookActivity(currentWeek, ID);
+                        Activity.BookActivity(currentWeek, ID);
                         break;
                     case ConsoleKey.D:
                         Console.WriteLine("\n>> Select a day to view:");
@@ -106,43 +106,16 @@ namespace Gym_Booking_Manager.Schedules
                 }
             }
         }
-        private static void BookActivity(int week, int ID)
-        {
-            Customer customer = (Customer)User.users[ID];
-            bool printedSomething = false;
-            List<Activity> weekActivities = Activity.activities.Where(a => ISOWeek.GetWeekOfYear(a.date.timeFrom) == week).ToList();
-            Console.WriteLine("Which activity do you want to book? (type in the number from the listed activites)");
-            string input = Console.ReadLine();
-            int.TryParse(input, out var which);
-            foreach (Activity a in weekActivities) 
-            {
-                if (a.id==which && a.limit>a.participants.Count() && customer.subStart<a.date.timeFrom && customer.subEnd>a.date.timeTo && Activity.activities[a.id].participants.Contains(User.users[ID])==false)
-                {
-                    Console.WriteLine($"{a.name} booked!");
-                    Activity.activities[a.id].participants.Add(customer);                    
-                }
-                else if (a.id == which && a.limit == a.participants.Count() && customer.subStart < a.date.timeFrom && customer.subEnd > a.date.timeTo && Activity.activities[a.id].participants.Contains(User.users[ID]) == false)
-                {
-                    Console.WriteLine("The activity is fully booked");
-                }
-                else if (a.id == which && Activity.activities[a.id].participants.Contains(User.users[ID]) == true)
-                {
-                    Console.WriteLine("You are already booked to this activity");
-                }
-                else if (a.id == which && customer.subStart > a.date.timeFrom || a.id == which && customer.subEnd < a.date.timeTo)
-                {
-                    Console.WriteLine("You do not have an active subscription for the date of this activity");
-                }
-            }
-            Activity.SaveActivities();
-        }
+
         private static void ViewScheduleMonth()
         {
 
         }
         private static void ViewScheduleWeek(int year, int week, int ID)
         {
-            Customer customer = (Customer)User.users[ID];
+            Customer customer=new Customer();
+            if (User.users[ID] is Customer)
+                    customer = (Customer)User.users[ID];
             // Filtering Reservation.reservations list based on weekNr of date.timeFrom
             List<Activity> weekActivities = Activity.activities.Where(a => ISOWeek.GetWeekOfYear(a.date.timeFrom) == week).ToList();
 

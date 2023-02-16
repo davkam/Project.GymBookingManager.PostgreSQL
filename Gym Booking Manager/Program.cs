@@ -18,7 +18,6 @@ namespace Gym_Booking_Manager
             Reservable.LoadReservables();
             Reservation.LoadReservations();
             Activity.LoadActivities();
-
             // MAIN SOFTWARE LOOP RUNS BELOW:
             RunGBM();
         }
