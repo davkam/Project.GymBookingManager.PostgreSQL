@@ -79,12 +79,18 @@ namespace Gym_Booking_Manager.Reservables
             }
             catch { Program.logger.LogActivity("ERROR: SaveReservables() - Write data (\"Reservations/Reservables.txt\") unsuccessful."); }
         }
+        private static int GetReservableID()
+        {
+            int id = getReservableID;
+            getReservableID++;
+            return id;
+        }
         public static void NewReservable()
         {
             bool go = true;
             while (go == true)
             {
-                Console.WriteLine("Skriv 1 för att registrera utrustning, 2 för att registrera utrymme, 3 för att registrera PT, 4 Avsluta");
+                Console.WriteLine("Write 1 to registrer Equipment, 2 to register space, 3 to register PT PT, 4 to Quit");
                 string input = Console.ReadLine();
                 switch (input)
                 {
@@ -100,30 +106,29 @@ namespace Gym_Booking_Manager.Reservables
                     case "4":
                         go = false;
                         break;
+                    default:
+                        Console.WriteLine("Incorrect input!");
+                        break;
                 }
             }
-        }
-        private static int GetReservableID()
-        {
-            int id = getReservableID;
-            getReservableID++;
-            return id;
         }
         public static void NewEquipment()
         {
             string[] input = new string[3];
-            Console.Write("Skriv in utrustningens namn: ");
+            Console.Write("Write the space name: ");
             input[0] = Console.ReadLine();
-            Console.Write("Skriv in utrustningens beskrivning: ");
+            Console.Write("Write the space description: ");
             input[1] = Console.ReadLine();
-            Console.Write("Ska kund kunna boka denna utrustning? ");
-            input[1] = Console.ReadLine();
-            int ID = GetReservableID();
+            Console.Write("Should non-members be able to book this? (yes or no)");
+            input[2] = Console.ReadLine();
+            if (input[2] == "Yes" || input[2] == "yes" || input[2] == "YES") input[2] = "true";
+            else input[2] = "false";
             Console.WriteLine();
-            Console.WriteLine("Vill du spara namn:" + input[0] + " " + input[1] + " skriv ja om du vill det");
+            Console.WriteLine("Do you want to save:" + input[0] + " " + input[1] + " write yes if so");
             string spara = Console.ReadLine();
             if (spara == "ja" || spara == "Ja" || spara == "JA")
             {
+                int ID = GetReservableID();
                 reservables.Add(new Equipment(ID, input[0], input[1], bool.Parse(input[2])));
                 SaveReservables();
             }
@@ -131,18 +136,24 @@ namespace Gym_Booking_Manager.Reservables
         public static void NewSpace()
         {
             string[] input = new string[3];
-            Console.Write("Skriv in lokalens namn: ");
+            Console.Write("Write the space name: ");
             input[0] = Console.ReadLine();
-            Console.Write("Skriv in lokalens beskrivning: ");
+            Console.Write("Write the space description: ");
             input[1] = Console.ReadLine();
-            Console.Write("Skriv in lokalens kapacitet: ");
-            input[2] = Console.ReadLine();
-            int ID = GetReservableID();
-            Console.WriteLine();
-            Console.WriteLine("Vill du spara namn:" + input[0] + " " + input[1] + " " + input[2] + "? skriv ja om du vill det");
-            string spara = Console.ReadLine();
-            if (spara == "ja" || spara == "Ja" || spara == "JA")
+            while (true)
             {
+                Console.Write("Write the space capacity: ");
+                input[2] = Console.ReadLine();
+                int.TryParse(input[2], out int no);
+                if (no > 0) break;
+                else Console.WriteLine("Incorrect input!");
+            }
+            Console.WriteLine();
+            Console.WriteLine("Do you want to save:" + input[0] + " " + input[1] + " " + input[2] + " write yes if so");
+            string spara = Console.ReadLine();
+            if (spara == "yes" || spara == "Yes" || spara == "YES")
+            {
+                int ID = GetReservableID();
                 reservables.Add(new Space(ID, input[0], input[1], int.Parse(input[2])));
                 SaveReservables();
             }
@@ -159,15 +170,15 @@ namespace Gym_Booking_Manager.Reservables
             }
             else
             {
-                Console.Write("Skriv in ID av PT'ens ID: ");
+                Console.Write("Write ID of PT: ");
                 int trainerID = int.Parse(Console.ReadLine());
-                int ID = GetReservableID();
                 Console.WriteLine();
-                Console.WriteLine("Vill du spara en PT session med trainer ID " + trainerID + "? skriv ja om du vill det");
+                Console.WriteLine("Do you want to save " + trainerID + "? write yes if so");
                 string spara = Console.ReadLine();
-                if (spara == "ja" || spara == "Ja" || spara == "JA")
+                if (spara == "yes" || spara == "Yes" || spara == "YES")
                 {
                     Staff ptrainer = (Staff)User.users[trainerID];
+                    int ID = GetReservableID();
                     reservables.Add(new PTrainer(ID, ptrainer));
                     SaveReservables();
                 }
