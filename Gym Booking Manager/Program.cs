@@ -1,5 +1,6 @@
 ﻿using Gym_Booking_Manager.Activities;
 using Gym_Booking_Manager.Logger;
+using Gym_Booking_Manager.ManagementFunctions;
 using Gym_Booking_Manager.Reservables;
 using Gym_Booking_Manager.Reservations;
 using Gym_Booking_Manager.Users;
@@ -16,8 +17,8 @@ namespace Gym_Booking_Manager
             User.LoadUsers();
             Reservable.LoadReservables();
             Reservation.LoadReservations();
-            Activity.LoadActivities(); 
-            
+            Activity.LoadActivities();
+
             // MAIN SOFTWARE LOOP RUNS BELOW:
             RunGBM();
         }
@@ -30,7 +31,7 @@ namespace Gym_Booking_Manager
             {
                 Console.Clear();                
                 Console.WriteLine("<< GYM BOOKING MANAGER >>\n");
-                Console.WriteLine(">> Press any key to log in, or escape to quit!");
+                Console.WriteLine(">> Press any key to log in, or [ESC] to quit!");
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
                 if (keyInfo.Key == ConsoleKey.Escape)
@@ -41,7 +42,7 @@ namespace Gym_Booking_Manager
                 }
                 else
                 {
-                    userID = User.LoginUser();
+                    userID = Management.UserLogin();
                     if (userID != -1)
                     {
                         currentUser = User.users.Find(u => u.id == userID);

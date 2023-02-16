@@ -1,4 +1,5 @@
 ﻿using Gym_Booking_Manager.Activities;
+using Gym_Booking_Manager.ManagementFunctions;
 using System.Globalization;
 
 namespace Gym_Booking_Manager.Schedules
@@ -12,7 +13,7 @@ namespace Gym_Booking_Manager.Schedules
             this.timeFrom = timeFrom;
             this.timeTo = timeTo;
         }
-        public static void ViewCalendarMenu()
+        public static void ViewScheduleMenu()
         {
             ConsoleKeyInfo keyPressed;
 
@@ -23,12 +24,12 @@ namespace Gym_Booking_Manager.Schedules
             if (keyPressed.Key == ConsoleKey.D1 || keyPressed.Key == ConsoleKey.NumPad1)
             {
                 Task.Delay(250).Wait();
-                SelectCalendarWeek();
+                SelectScheduleWeek();
             }
             else if (keyPressed.Key == ConsoleKey.D2 || keyPressed.Key == ConsoleKey.NumPad2)
             {
                 Task.Delay(250).Wait();
-                ViewCalendarMonth();
+                ViewScheduleMonth();
             }
             else if (keyPressed.Key == ConsoleKey.Escape)
             {
@@ -41,13 +42,13 @@ namespace Gym_Booking_Manager.Schedules
                 Task.Delay(500).Wait();
             }
         }
-        private static void SelectCalendarWeek()
+        private static void SelectScheduleWeek()
         {
             int currentYear = ISOWeek.GetYear(DateTime.Now);
             int currentWeek = ISOWeek.GetWeekOfYear(DateTime.Now);
             bool escape = false;
 
-            ViewCalendarWeek(currentYear, currentWeek);
+            ViewScheduleWeek(currentYear, currentWeek);
 
             while (!escape)
             {
@@ -58,7 +59,7 @@ namespace Gym_Booking_Manager.Schedules
                         try
                         {
                             currentWeek -= 1;
-                            ViewCalendarWeek(currentYear, currentWeek);
+                            ViewScheduleWeek(currentYear, currentWeek);
                         }
                         catch (System.ArgumentOutOfRangeException)
                         {
@@ -71,7 +72,7 @@ namespace Gym_Booking_Manager.Schedules
                         try
                         {
                             currentWeek += 1;
-                            ViewCalendarWeek(currentYear, currentWeek);
+                            ViewScheduleWeek(currentYear, currentWeek);
                         }
                         catch (System.ArgumentOutOfRangeException)
                         {
@@ -95,7 +96,7 @@ namespace Gym_Booking_Manager.Schedules
                         Console.WriteLine();
 
                         keyPressed = Console.ReadKey(true);
-                        ViewWeekDay(currentYear, currentWeek, keyPressed);
+                        ViewScheduleDay(currentYear, currentWeek, keyPressed);
                         break;
                     case ConsoleKey.Escape:
                         escape = true;
@@ -104,11 +105,11 @@ namespace Gym_Booking_Manager.Schedules
                 }
             }
         }
-        private static void ViewCalendarMonth()
+        private static void ViewScheduleMonth()
         {
 
         }
-        private static void ViewCalendarWeek(int year, int week)
+        private static void ViewScheduleWeek(int year, int week)
         {
             // Filtering Reservation.reservations list based on weekNr of date.timeFrom
             List<Activity> weekActivities = Activity.activities.Where(a => ISOWeek.GetWeekOfYear(a.date.timeFrom) == week).ToList();
@@ -192,7 +193,7 @@ namespace Gym_Booking_Manager.Schedules
             Console.WriteLine($"\n|------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|");
             Console.WriteLine($"\n{"<< [LEFT.ARROW](Prev. Week)",-32}{"[V](View Act.)",-20}{"[D](View Day)",-18}{"[ESC](Cancel)",-18}{"[RIGHT ARROW](Next Week) >>",-25}");
         }
-        private static void ViewWeekDay(int year, int week, ConsoleKeyInfo key)
+        private static void ViewScheduleDay(int year, int week, ConsoleKeyInfo key)
         {
             List<Activity> dayReservations = Activity.activities.Where(activity => ISOWeek.GetWeekOfYear(activity.date.timeFrom) == week).ToList();
             DayOfWeek dayOfWeek = DayOfWeek.Monday;
@@ -257,6 +258,119 @@ namespace Gym_Booking_Manager.Schedules
                 Console.WriteLine("End date/time is the same or earlier then start date/time, try again.");
                 run = true;
                 goto rerun;
+            }
+        }
+        public static DateTime DateTimeSelecter()
+        {
+            DateTime selectDateTime = DateTime.Now.Date;
+            ConsoleKeyInfo keyInfo;
+
+            YearSelecter(ref selectDateTime);
+            MonthSelecter(ref selectDateTime);
+            DaySelecter(ref selectDateTime);
+            TimeSelecter(ref selectDateTime);
+
+            return selectDateTime; 
+        }
+        private static void YearSelecter(ref DateTime dateTime)
+        {
+            ConsoleKeyInfo keyInfo;
+            bool runYear = true;
+            while (runYear)
+            {
+                Console.WriteLine($"{$"<< YEAR SELECTER >>",50}");
+                Console.WriteLine($"{$">> {dateTime.ToString()[0..^9]} <<",48}");
+                Console.WriteLine($"{"<< PREV YEAR[LEFT.ARROW]",-26}{"ACCEPT[ENTER]",-15}{"EXIT[ESC]",-11}{"[RIGHT.ARROW]NEXT YEAR >>",-24}");
+
+                keyInfo = Console.ReadKey(true);
+                switch (keyInfo.Key)
+                {
+                    case ConsoleKey.LeftArrow:
+                        if (dateTime > DateTime.Now) dateTime = dateTime.AddYears(-1);
+                        break;
+                    case ConsoleKey.RightArrow: dateTime = dateTime.AddYears(1); break;
+                    case ConsoleKey.Escape: return;
+                    case ConsoleKey.Enter: return;
+                    default: break;
+                }
+                Management.ClearLines(3);
+            }
+        }
+        private static void MonthSelecter(ref DateTime dateTime)
+        {
+            ConsoleKeyInfo keyInfo;
+            bool runMonth = true;
+            while (runMonth)
+            {
+                Console.WriteLine($"{$"<< MONTH SELECTER >>",50}");
+                Console.WriteLine($"{$">> {dateTime.ToString()[0..^9]} <<",48}");
+                Console.WriteLine($"{"<< PREV MONTH[LEFT.ARROW]",-26}{"ACCEPT[ENTER]",-15}{"EXIT[ESC]",-11}{"[RIGHT.ARROW]NEXT MONTH >>",-24}");
+
+                keyInfo = Console.ReadKey(true);
+                switch (keyInfo.Key)
+                {
+                    case ConsoleKey.LeftArrow:
+                        if (dateTime > DateTime.Now) dateTime = dateTime.AddMonths(-1);
+                        break;
+                    case ConsoleKey.RightArrow: dateTime = dateTime.AddMonths(1); break;
+                    case ConsoleKey.Escape: return;
+                    case ConsoleKey.Enter: return;
+                    default: break;
+                }
+                Management.ClearLines(3);
+            }
+        }
+        private static void DaySelecter(ref DateTime dateTime)
+        {
+            ConsoleKeyInfo keyInfo;
+            bool runDay = true;
+            while (runDay)
+            {
+                Console.WriteLine($"{$"<< DAY SELECTER >>",50}");
+                Console.WriteLine($"{$">> {dateTime.ToString()[0..^9]} <<",48}");
+                Console.WriteLine($"{"<< PREV DAY[LEFT.ARROW]",-26}{"ACCEPT[ENTER]",-15}{"EXIT[ESC]",-11}{"[RIGHT.ARROW]NEXT DAY >>",-24}");
+
+                keyInfo = Console.ReadKey(true);
+                switch (keyInfo.Key)
+                {
+                    case ConsoleKey.LeftArrow:
+                        if (dateTime > DateTime.Now) dateTime = dateTime.AddDays(-1);
+                        break;
+                    case ConsoleKey.RightArrow: dateTime = dateTime.AddDays(1); break;
+                    case ConsoleKey.Escape: return;
+                    case ConsoleKey.Enter: return;
+                    default: break;
+                }
+                Management.ClearLines(3);
+            }
+        }
+        private static void TimeSelecter(ref DateTime dateTime)
+        {
+            ConsoleKeyInfo keyInfo;
+            bool runTime = true;
+            dateTime = dateTime.AddHours(8);
+
+            while (runTime)
+            {
+                if (dateTime.Hour < 8) dateTime = dateTime.AddHours(1);
+                if (dateTime.Hour > 19) dateTime = dateTime.AddHours(-1);
+
+                Console.WriteLine($"{$"<< TIME SELECTER >>",50}");
+                Console.WriteLine($"{$">> {dateTime.ToString()[^8..]} <<",48}");
+                Console.WriteLine($"{"<< PREV HOUR[LEFT.ARROW]",-26}{"ACCEPT[ENTER]",-15}{"EXIT[ESC]",-11}{"[RIGHT.ARROW]NEXT HOUR >>",-24}");
+
+                keyInfo = Console.ReadKey(true);
+                switch (keyInfo.Key)
+                {
+                    case ConsoleKey.LeftArrow:
+                        if (dateTime > DateTime.Now) dateTime = dateTime.AddHours(-1);
+                        break;
+                    case ConsoleKey.RightArrow: dateTime = dateTime.AddHours(1); break;
+                    case ConsoleKey.Escape: return;
+                    case ConsoleKey.Enter: return;
+                    default: break;
+                }
+                Management.ClearLines(3);
             }
         }
     }
