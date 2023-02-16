@@ -703,6 +703,25 @@ namespace Gym_Booking_Manager.Users
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
             Task.Delay(1000).Wait();
         }
+        protected override void ReservableManagerMenu()
+        {
+            Console.Clear();
+            Console.WriteLine("<< RESERVABLE MANAGER >>\n");
+            Console.WriteLine("- [1]   Register a reservable.");
+            Console.WriteLine("- [2]   Deregister a reservable.");
+            Console.WriteLine("- [3]   Edit a reservable.");
+            Console.WriteLine("- [4]   View all reservables.");
+            Console.WriteLine("- [ESC] Exit.");
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+
+            if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) Reservable.NewReservable(this);
+            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) Reservable.DeleteReservable(this);
+            else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) Reservable.EditReservable(this);
+            else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) Reservable.ViewReservables();
+            else if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> Reservable manager cancelled!");
+            else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
+            Task.Delay(1000).Wait();
+        }
         public override void MainMenu()
         {
             bool cancel = false;
@@ -712,13 +731,14 @@ namespace Gym_Booking_Manager.Users
                 Console.WriteLine("<< STAFF MENU >>\n");
                 Console.WriteLine($">> LOGGED IN: {firstName} {lastName}");
                 Console.WriteLine("\n>> Select an option!");
-                Console.WriteLine($"{"- [1]",-8}Manage customers.\n{"- [2]",-8}Manage activities.\n{"- [3]",-8}Manage reservations.\n{"- [4]",-8}Manage account.\n{"- [ESC]",-8}Log out.");
+                Console.WriteLine($"{"- [1]",-8}Manage customers.\n{"- [2]",-8}Manage activities.\n{"- [3]",-8}Manage reservations.\n{"- [4]",-8}Manage reservables.\n{"- [5]",-8}Manage account.\n{"- [ESC]",-8}Log out.");
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
                 if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) UserManagerMenu();
                 else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) ActivityManagerMenu();
                 else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) ReservationManagerMenu();
-                else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) AccountManagerMenu();
+                else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) ReservableManagerMenu();
+                else if (keyInfo.Key == ConsoleKey.D5 || keyInfo.Key == ConsoleKey.NumPad5) AccountManagerMenu();
                 else if (keyInfo.Key == ConsoleKey.Escape)
                 {
                     Console.WriteLine($"\n>> LOGGED OUT: {firstName} {lastName}");

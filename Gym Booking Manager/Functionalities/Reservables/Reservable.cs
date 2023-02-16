@@ -1,5 +1,8 @@
 ﻿using Gym_Booking_Manager.Reservations;
 using Gym_Booking_Manager.Users;
+using System.Diagnostics;
+using System.Globalization;
+using System.Transactions;
 
 namespace Gym_Booking_Manager.Reservables
 {
@@ -11,12 +14,13 @@ namespace Gym_Booking_Manager.Reservables
         public int id { get; set; }
         public string name { get; set; }
         public string description { get; set; }
-        public static List<Reservation> reservations { get; set; }
+        public List<Reservation> reservations { get; set; }
         public Reservable(int id, string name, string description)
         {
             this.id = id;
             this.name = name;
             this.description = description;
+            reservations = new List<Reservation>();
         }
         public static void LoadReservables()
         {
@@ -85,10 +89,10 @@ namespace Gym_Booking_Manager.Reservables
             getReservableID++;
             return id;
         }
-        public static void NewReservable()
+        public static void NewReservable(Staff staff)
         {
-            bool go = true;
-            while (go == true)
+            bool run = true;
+            while (run == true)
             {
                 Console.WriteLine("Write 1 to registrer Equipment, 2 to register space, 3 to register PT PT, 4 to Quit");
                 string input = Console.ReadLine();
@@ -104,7 +108,7 @@ namespace Gym_Booking_Manager.Reservables
                         NewPT();
                         break;
                     case "4":
-                        go = false;
+                        run = false;
                         break;
                     default:
                         Console.WriteLine("Incorrect input!");
@@ -184,13 +188,102 @@ namespace Gym_Booking_Manager.Reservables
                 }
             }
         }
-        public static void UpdateReservable()
+        public static void DeleteReservable(Staff staff)
+        {
+            // Staff deletes existing reservables.
+        }
+        public static void EditReservable(Staff staff)
         {
             // Staff updates existing reservables.
         }
-        public void DeleteReservable()
+        public static void ViewReservables(bool footer = true)
         {
-            // Staff deletes existing reservables.
+            reservables.Sort((x, y) => x.GetType().Name.CompareTo(y.GetType().Name));
+
+            string typeReservable = "Equipment";
+            int x , y;
+
+            Console.Clear();
+            Console.WriteLine("<< VIEW RESERVABLES >>\n");
+            (x, y) = Console.GetCursorPosition();
+
+            foreach (Reservable rsvb in reservables)
+            {
+                if (typeReservable != rsvb.GetType().Name || x >= 120)
+                {
+                    x = 0;
+                    y += 6;
+                }
+
+                Console.SetCursorPosition(x, y);
+                Console.Write($"- TYPE:        {rsvb.GetType().Name}");
+                Console.SetCursorPosition(x, y + 1);
+                Console.Write($"- ID:          {rsvb.id}");
+                Console.SetCursorPosition(x, y + 2);
+                Console.Write($"- NAME:        {rsvb.name}");
+                Console.SetCursorPosition(x, y + 3);
+                Console.Write($"- DESCRIPTION:");
+                Console.SetCursorPosition(x, y + 4);
+                Console.Write($" ({rsvb.description})");
+
+                x += 40;
+                typeReservable = rsvb.GetType().Name;
+            }
+            Console.WriteLine();
+
+            if (footer)
+            {
+                Console.WriteLine("\n>> Press any key to continue, or [V] to view a reservable.");
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.V)
+                {
+                    try
+                    {
+                        Console.Write(">> Enter ID of reservable to view: ");
+                        int id = int.Parse(Console.ReadLine());
+                        ViewReservable(id);
+                    }
+                    catch { return; }
+                }
+            }
+        }
+        private static void ViewReservable(int id)
+        {
+            int x, y;
+
+            Console.Clear();
+            Console.WriteLine("<< VIEW RESERVABLE >>\n");
+            foreach (Reservable rsvb in reservables)
+            {
+                if (rsvb.id == id)
+                {
+                    Console.WriteLine($"- TYPE:        {rsvb.GetType().Name}");
+                    Console.WriteLine($"- ID:          {rsvb.id}");
+                    Console.WriteLine($"- NAME:        {rsvb.name}");
+                    Console.WriteLine($"- DESCRIPTION: {rsvb.description}");
+                    Console.WriteLine($"- RESERVED IN: (RESERVATIONS)");
+                    (x, y) = Console.GetCursorPosition();
+
+                    foreach (Reservation rsv in rsvb.reservations)
+                    {
+                        if (x > Console.BufferWidth)
+                        {
+                            x = 0;
+                            y++;
+                        }
+                        Console.SetCursorPosition(x, y);
+                        Console.Write($"  .ID:         {rsv.id}");
+                        Console.SetCursorPosition(x, y + 1);
+                        Console.Write($"  .DATE(FROM): {rsv.date.timeFrom}");
+                        Console.SetCursorPosition(x, y + 2);
+                        Console.Write($"  .DATE(TO):   {rsv.date.timeTo}");
+
+                        x += 40;
+                    }
+                }
+            }
+            Console.WriteLine("\n>> Press any key to continue.");
+            Console.ReadKey(true);
         }
     }
     public class Equipment : Reservable
