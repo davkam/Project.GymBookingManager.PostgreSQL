@@ -37,7 +37,7 @@ namespace Gym_Booking_Manager.Activities
         {
             try
             {
-                string[] lines = File.ReadAllLines("Activities/Activities.txt");
+                string[] lines = File.ReadAllLines("Functionalities/Activities/Activities.txt");
                 getActivityID = int.Parse(lines[0]);
 
                 for (int i = 1; i < lines.Length; i++)
@@ -68,7 +68,7 @@ namespace Gym_Booking_Manager.Activities
         {
             try
             {
-                using (StreamWriter writer = new StreamWriter("Activities/Activities.txt", false))
+                using (StreamWriter writer = new StreamWriter("Functionalities/Activities/Activities.txt", false))
                 {
                     writer.WriteLine(getActivityID);
                     foreach (Activity activity in activities)

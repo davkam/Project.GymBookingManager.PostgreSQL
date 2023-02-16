@@ -22,7 +22,7 @@ namespace Gym_Booking_Manager.Reservables
         {
             try
             {
-                string[] lines = File.ReadAllLines("Reservables/Reservables.txt");
+                string[] lines = File.ReadAllLines("Functionalities/Reservables/Reservables.txt");
                 getReservableID = int.Parse(lines[0]);
 
                 for (int i = 1; i < lines.Length; i++)
@@ -53,7 +53,7 @@ namespace Gym_Booking_Manager.Reservables
         {
             try
             {
-                using (StreamWriter writer = new StreamWriter("Reservables/Reservables.txt", false))
+                using (StreamWriter writer = new StreamWriter("Functionalities/Reservables/Reservables.txt", false))
                 {
                     writer.WriteLine(getReservableID);
                     for (int i = 0; i < reservables.Count; i++)
