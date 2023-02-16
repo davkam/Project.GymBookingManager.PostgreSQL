@@ -26,7 +26,7 @@ namespace Gym_Booking_Manager.Reservations
         {
             try
             {
-                string[] lines = File.ReadAllLines("Reservations/Reservations.txt");
+                string[] lines = File.ReadAllLines("Functionalities/Reservations/Reservations.txt");
                 getReservationID = int.Parse(lines[0]);
 
                 for (int i = 1; i < lines.Length; i++)
@@ -56,7 +56,7 @@ namespace Gym_Booking_Manager.Reservations
         {
             try
             {
-                using (StreamWriter writer = new StreamWriter("Reservations/Reservations.txt", false))
+                using (StreamWriter writer = new StreamWriter("Functionalities/Reservations/Reservations.txt", false))
                 {
                     writer.WriteLine(getReservationID);
                     foreach (Reservation rsv in reservations)
