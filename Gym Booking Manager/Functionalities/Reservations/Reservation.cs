@@ -156,7 +156,7 @@ namespace Gym_Booking_Manager.Reservations
                 if (!overlap && Reservable.reservables[i] is Equipment)
                 {
                     Equipment equipment = (Equipment)Reservable.reservables[i];
-                    if (equipment.bookable == true) ReservableToList.Add(Reservable.reservables[i].id);
+                    if (equipment.membersOnly == true) ReservableToList.Add(Reservable.reservables[i].id);
                 }
             }
             ChooseReservation(ReservableToList, userID, date);

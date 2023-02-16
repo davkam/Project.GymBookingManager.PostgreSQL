@@ -144,7 +144,7 @@ namespace Gym_Booking_Manager.Users
 
                 if (keyPressed.Key == ConsoleKey.Y)
                 {
-                    Reservable.NewPT((Staff)user);
+                    Reservable.NewPT((Staff)user, false);
                     Console.WriteLine("\n>> Added new staff as a personal trainer.");
                 }
                 else if (keyPressed.Key == ConsoleKey.N) Console.WriteLine("\n>> New staff not added as a personal trainer.");
@@ -554,8 +554,8 @@ namespace Gym_Booking_Manager.Users
                     }
                     catch
                     {
-                        Console.WriteLine(">> Invalid input!");
-                        Task.Delay(1000).Wait();
+                        Console.WriteLine(">> Invalid input, view user cancelled!");
+                        Task.Delay(1500).Wait();
                     }
                 }
             }
@@ -616,7 +616,10 @@ namespace Gym_Booking_Manager.Users
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
             Task.Delay(1000).Wait();
         }
-        public abstract void MainMenu();
+        public virtual void MainMenu()
+        {
+
+        }
     }
     public class Admin : User
     {
@@ -626,7 +629,7 @@ namespace Gym_Booking_Manager.Users
         protected override void UserManagerMenu()
         {
             Console.Clear();
-            Console.WriteLine("\n<< USER MANAGER >>");
+            Console.WriteLine("<< USER MANAGER >>\n");
             Console.WriteLine("- [1]   Register a user.");
             Console.WriteLine("- [2]   Deregister a user.");
             Console.WriteLine("- [3]   View all users.");
@@ -814,7 +817,7 @@ namespace Gym_Booking_Manager.Users
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
             Task.Delay(1000).Wait();
         }
-        protected void ReservationManagerMenu()
+        protected override void ReservationManagerMenu()
         {
             Console.Clear();
             Console.WriteLine("<< RESERVATION MANAGER >>\n");
