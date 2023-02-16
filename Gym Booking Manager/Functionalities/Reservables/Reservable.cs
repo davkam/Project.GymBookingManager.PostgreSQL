@@ -266,8 +266,8 @@ namespace Gym_Booking_Manager.Reservables
                 }
                 Console.Write("\n>> Enter id of staff to add as a personal trainer: ");
                 int input;
-                try 
-                { 
+                try
+                {
                     input = int.Parse(Console.ReadLine());
                     staffToPT = (Staff)User.users.Find(u => u.id == input);
                 }
@@ -378,7 +378,201 @@ namespace Gym_Booking_Manager.Reservables
         }
         public static void EditReservable(Staff staff)      // NYI: LOG ACTIVITY!
         {
-            // Staff updates existing reservables.
+            int inputID = -1;
+            Console.Clear();
+            Console.WriteLine($"{"<< EDIT RESERVABLE >>",64}\n");
+
+            ViewReservables(false, false);
+
+            Console.Write("\n>> Enter ID of the reservable to edit: ");
+            try { inputID = int.Parse(Console.ReadLine()); }
+            catch { Console.WriteLine(">> Invalid format, edit reservable cancelled!"); }
+
+            Console.Clear();
+            Console.WriteLine($"{"<< EDIT RESERVABLE >>",64}\n");
+
+            Reservable reservable = new();
+            if (inputID != -1)
+            {
+                reservable = reservables.Find(x => x.id == inputID);
+                if (reservable != null) ViewReservable(inputID, false, false);
+                else
+                {
+                    Console.WriteLine(">> Reservable not found, edit reservable cancelled!");
+                    Task.Delay(1500).Wait();
+                    return;
+                }
+            }
+
+            Console.WriteLine("\n>> Select an option to edit.");
+            Console.WriteLine("- [1]   Name.");
+            Console.WriteLine("- [2]   Description.");
+            Console.WriteLine("- [3]   Availability.");
+            if (reservable.GetType() == typeof(Equipment)) Console.WriteLine("- [4]   Restriction.");
+            if (reservable.GetType() == typeof(Space)) Console.WriteLine("- [4]   Capacity.");
+            Console.WriteLine($"- [5]   Reservations.");
+            Console.WriteLine("- [ESC] Exit.");
+
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+            if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) EditReservableName(ref reservable);
+            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) EditReservableDescription(ref reservable);
+            else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) EditReservableAvailability(ref reservable);
+            else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) EditReservableSpecials(ref reservable);
+            else if (keyInfo.Key == ConsoleKey.D5 || keyInfo.Key == ConsoleKey.NumPad5) EditReservableReservations(ref reservable);
+            else if (keyInfo.Key == ConsoleKey.Escape)
+            {
+                Console.WriteLine(">> Edit reservable cancelled!");
+                Task.Delay(1500).Wait();
+                return;
+            }
+            else
+            {
+                Console.WriteLine($">> INVALID KEY: [KEY.{keyInfo.Key}], edit reservable cancelled!");
+                Task.Delay(1500).Wait();
+                return;
+            }
+            SaveReservables();
+        }
+        private static void EditReservableName(ref Reservable reservable)
+        {
+            Console.Write("\n>> Enter new reservable name: ");
+            string name = Console.ReadLine();
+            Console.WriteLine($">> Edit name of reservable from \"{reservable.name}\" to \"{name}\"?");
+            Console.WriteLine(">> Press any key to accept, or [ESC] to cancel!");
+
+            ConsoleKeyInfo keyInfo = Console.ReadKey();
+            if (keyInfo.Key == ConsoleKey.Escape)
+            {
+                Console.WriteLine(">> Edit name of reservable cancelled!");
+                Task.Delay(1500).Wait();
+                return;
+            }
+            else
+            {
+                reservable.name = name;
+                Console.WriteLine(">> Edited name of reservable successfully!");
+                Task.Delay(1500).Wait();
+            }
+        }
+        private static void EditReservableDescription(ref Reservable reservable)
+        {
+            Console.Write("\n>> Enter new reservable description: ");
+            string description = Console.ReadLine();
+            Console.WriteLine($">> Edit description of reservable from \"{reservable.description}\" to \"{description}\"?");
+            Console.WriteLine(">> Press any key to accept, or [ESC] to cancel!");
+
+            ConsoleKeyInfo keyInfo = Console.ReadKey();
+            if (keyInfo.Key == ConsoleKey.Escape)
+            {
+                Console.WriteLine(">> Edit description of reservable cancelled!");
+                Task.Delay(1500).Wait();
+                return;
+            }
+            else
+            {
+                reservable.description = description;
+                Console.WriteLine(">> Edited description of reservable successfully!");
+                Task.Delay(1500).Wait();
+            }
+        }
+        private static void EditReservableAvailability(ref Reservable reservable)
+        {
+            Console.WriteLine("\n>> Select an availability option: ");
+            Console.WriteLine("- [1]   Available. (True)");
+            Console.WriteLine("- [2]   Unavailable. (False)");
+            Console.WriteLine("- [ESC] Exit.");
+
+            ConsoleKeyInfo keyInfo = Console.ReadKey();
+            if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) reservable.isAvailable = true;
+            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) reservable.isAvailable = false;
+            else if (keyInfo.Key == ConsoleKey.Escape)
+            {
+                Console.WriteLine(">> Edit availability of reservable cancelled!");
+                Task.Delay(1500).Wait();
+                return;
+            }
+            else
+            {
+                Console.WriteLine($">> INVALID KEY: [KEY.{keyInfo.Key}], edit availability of reservable cancelled!");
+                Task.Delay(1500).Wait();
+                return;
+            }
+            Console.WriteLine(">> Edited availability of reservable successfully!");
+            Task.Delay(1500).Wait();
+        }
+        private static void EditReservableSpecials(ref Reservable reservable)
+        {
+            if (reservable is Equipment)
+            {
+                Equipment tempEquipment = (Equipment)reservable;
+
+                Console.WriteLine("\n>> Select a restriction option:");
+                Console.WriteLine("- [1]   Members only restriction. (True)");
+                Console.WriteLine("- [2]   Free for all. (False)");
+                Console.WriteLine("- [ESC] Exit ");
+
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+                if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) tempEquipment.membersOnly = true;
+                else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) tempEquipment.membersOnly = false;
+                else if (keyInfo.Key == ConsoleKey.Escape)
+                {
+                    Console.WriteLine(">> Edit restriction of equipment cancelled!");
+                    Task.Delay(1500).Wait();
+                    return;
+                }
+                else
+                {
+                    Console.WriteLine($">> INVALID KEY: [KEY.{keyInfo.Key}], edit restriction of equipment cancelled!");
+                    Task.Delay(1500).Wait();
+                    return;
+                }
+                Console.WriteLine(">> Edited restriction of equipment successfully!");
+                Task.Delay(1500).Wait();
+            }
+            if (reservable is Space)
+            {
+                Space tempSpace = (Space)reservable;
+                int capacity = -1;
+
+                Console.Write("\n>> Enter new space capacity: ");
+                try { capacity = int.Parse(Console.ReadLine()); }
+                catch 
+                {
+                    Console.WriteLine(">> Invalid format, edit space capacity cancelled!");
+                    Task.Delay(1500).Wait();
+                    return;
+                }
+                if (capacity > 0)
+                {
+                    Console.WriteLine($">> Edit capacity of space from \"{tempSpace.capacity}\" to \"{capacity}\"?");
+                    Console.Write(">> Press any key to accept, or [ESC] to cancel!");
+
+                    ConsoleKeyInfo keyInfo = Console.ReadKey();
+                    if (keyInfo.Key == ConsoleKey.Escape)
+                    {
+                        Console.WriteLine(">> Edit capacity of space cancelled!");
+                        Task.Delay(1500).Wait();
+                        return;
+                    }
+                    else
+                    {
+                        tempSpace.capacity = capacity;
+                        Console.WriteLine(">> Edited capacity of space successfully!");
+                        Task.Delay(1500).Wait();
+                    }
+                }
+                else
+                {
+                    Console.WriteLine(">> Invalid amount, edit space capacity cancelled!");
+                    Task.Delay(1500).Wait();
+                    return;
+                }
+            }
+        }
+        private static void EditReservableReservations(ref Reservable reservable)   // NYI!
+        {
+            Console.WriteLine("\n>> NOT YET IMPLEMENTED!");
+            Task.Delay(1500).Wait();
         }
         public static void ViewReservables(bool header = true, bool footer = true)
         {
@@ -386,12 +580,11 @@ namespace Gym_Booking_Manager.Reservables
 
             string typeReservable = "Equipment";
             int x, y;
-            int addY = 0;
 
             if (header)
             {
                 Console.Clear();
-                Console.WriteLine("<< VIEW RESERVABLES >>\n");
+                Console.WriteLine($"{"<< VIEW RESERVABLES >>",64}\n");
             }
 
             (x, y) = Console.GetCursorPosition();
@@ -400,32 +593,22 @@ namespace Gym_Booking_Manager.Reservables
                 if (typeReservable != rsvb.GetType().Name || x >= 120)
                 {
                     x = 0;
-                    y += 8;
+                    y += 6;
                 }
 
                 Console.SetCursorPosition(x, y);
-                Console.Write($"- TYPE:          {rsvb.GetType().Name}");
+                Console.Write($"- TYPE: {rsvb.GetType().Name}");
                 Console.SetCursorPosition(x, y + 1);
-                Console.Write($"- ID:            {rsvb.id}");
+                Console.Write($"- ID:   {rsvb.id}");
                 Console.SetCursorPosition(x, y + 2);
-                Console.Write($"- NAME:          {rsvb.name}");
+                Console.Write($"- NAME: {rsvb.name}");
                 Console.SetCursorPosition(x, y + 3);
-                Console.Write($"- AVAILABILITY:  {rsvb.isAvailable}");
-                if (rsvb.GetType().Name == "Equipment")
-                {
-                    Equipment equipment = (Equipment)rsvb;
-                    Console.SetCursorPosition(x, y + 4);
-                    Console.Write($"- MEMBERS ONLY:  {equipment.membersOnly}");
-                    addY++;
-                }
-                Console.SetCursorPosition(x, y + 4 + addY);
                 Console.Write($"- DESCRIPTION:");
-                Console.SetCursorPosition(x, y + 5 + addY);
-                Console.Write($"  \"{rsvb.description}\"");
-                addY = 0;
+                Console.SetCursorPosition(x, y + 4);
+                if (rsvb.description.Length > 26) Console.Write($" \"{rsvb.description[0..23] + "..."}\"");
+                else Console.Write($" \"{rsvb.description}\"");
 
-
-                x += 40;
+                x += 30;
                 typeReservable = rsvb.GetType().Name;
             }
             Console.WriteLine();
@@ -433,7 +616,7 @@ namespace Gym_Booking_Manager.Reservables
             if (footer)
             {
                 int id = -1;
-                Console.WriteLine("\n>> Press any key to continue, or [V] to view a reservable.");
+                Console.WriteLine("\n>> Press any key to continue, or [V] to view details of a reservable.");
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
                 if (keyInfo.Key == ConsoleKey.V)
                 {
@@ -447,52 +630,66 @@ namespace Gym_Booking_Manager.Reservables
                 if (id != -1) ViewReservable(id);
             }
         }
-        private static void ViewReservable(int id)
+        private static void ViewReservable(int id, bool header = true, bool footer = true)
         {
             bool found = false;
             int x, y;
 
-            Console.Clear();
-            Console.WriteLine("<< VIEW RESERVABLE >>\n");
-            foreach (Reservable rsvb in reservables)
+            if (header)
             {
-                if (rsvb.id == id)
+                Console.Clear();
+                Console.WriteLine("<< VIEW RESERVABLE >>\n");
+            }
+            var reservable = reservables.Find(x => x.id == id);
+            if (reservable != null)
+            {
+                Console.WriteLine($"- TYPE:         {reservable.GetType().Name}");
+                Console.WriteLine($"- ID:           {reservable.id}");
+                Console.WriteLine($"- NAME:         {reservable.name}");
+                Console.WriteLine($"- DESCRIPTION:  \"{reservable.description}\"");
+                Console.WriteLine($"- AVAILABILITY: {reservable.isAvailable}");
+                if (reservable is Equipment)
                 {
-                    found = true;
-                    Console.WriteLine($"- TYPE:         {rsvb.GetType().Name}");
-                    Console.WriteLine($"- ID:           {rsvb.id}");
-                    Console.WriteLine($"- NAME:         {rsvb.name}");
-                    Console.WriteLine($"- AVAILABILITY: {rsvb.isAvailable}");
-                    if (rsvb.GetType().Name == "Equipment")
-                    {
-                        Equipment equipment = (Equipment)rsvb;
-                        Console.WriteLine($"- MEMBERS ONLY: {equipment.membersOnly}");
-                    }
-                    Console.WriteLine($"- DESCRIPTION:  \"{rsvb.description}\"");
-                    Console.WriteLine($"- RESERVED IN:  (NYI)");
-                    (x, y) = Console.GetCursorPosition();
+                    Equipment equipment = (Equipment)reservable;
+                    Console.WriteLine($"- MEMBERS ONLY: {equipment.membersOnly}");
+                }
+                if (reservable is Space)
+                {
+                    Space space = (Space)reservable;
+                    Console.WriteLine($"- CAPACITY:     {space.capacity}");
+                }
+                if (reservable is PTrainer)
+                {
+                    PTrainer ptrainer = (PTrainer)reservable;
+                    Console.WriteLine($"- INSTRUCTOR:   {ptrainer.instructor.firstName} {ptrainer.instructor.lastName}");
+                }
+                Console.WriteLine($"- RESERVED FOR: (RESERVATIONS)");
+                (x, y) = Console.GetCursorPosition();
 
-                    foreach (Reservation rsv in rsvb.reservations)
+                foreach (Reservation reservation in reservable.reservations)
+                {
+                    if (x > Console.BufferWidth)
                     {
-                        if (x > Console.BufferWidth)
-                        {
-                            x = 0;
-                            y++;
-                        }
-                        Console.SetCursorPosition(x, y);
-                        Console.Write($"  .ID:         {rsv.id}");
-                        Console.SetCursorPosition(x, y + 1);
-                        Console.Write($"  .DATE(FROM): {rsv.date.timeFrom}");
-                        Console.SetCursorPosition(x, y + 2);
-                        Console.Write($"  .DATE(TO):   {rsv.date.timeTo}");
-
-                        x += 40;
+                        x = 0;
+                        y++;
                     }
+                    Console.SetCursorPosition(x, y);
+                    Console.Write($"  .ID:         {reservation.id}");
+                    Console.SetCursorPosition(x, y + 1);
+                    Console.Write($"  .DATE(FROM): {reservation.date.timeFrom}");
+                    Console.SetCursorPosition(x, y + 2);
+                    Console.Write($"  .DATE(TO):   {reservation.date.timeTo}");
+
+                    x += 40;
                 }
             }
-            if (!found) Console.WriteLine(">> Could not find reservable, try again!");
-            Console.WriteLine("\n>> Press any key to continue.");
-            Console.ReadKey(true);
+            else Console.WriteLine(">> Reservable not found, view reservable cancelled!");
+
+            if (footer)
+            {
+                Console.WriteLine("\n>> Press any key to continue.");
+                Console.ReadKey(true);
+            }
         }
     }
     public class Equipment : Reservable
@@ -503,6 +700,7 @@ namespace Gym_Booking_Manager.Reservables
         {
             this.membersOnly = membersOnly;
         }
+        public Equipment() : base() { }
     }
     public class Space : Reservable
     {
@@ -516,10 +714,10 @@ namespace Gym_Booking_Manager.Reservables
     public class PTrainer : Reservable
     {
         public Staff instructor { get; set; }
-        public PTrainer(int id, bool isAvailable, Staff PTrainer)
-            : base(id, $"{PTrainer.firstName} {PTrainer.lastName}", $"{PTrainer.phone}, {PTrainer.email}", isAvailable)
+        public PTrainer(int id, bool isAvailable, Staff instructor)
+            : base(id, $"{instructor.firstName} {instructor.lastName}", $"{instructor.phone}, {instructor.email}", isAvailable)
         {
-            this.instructor = PTrainer;
+            this.instructor = instructor;
         }
         public PTrainer() : base() { }
     }
