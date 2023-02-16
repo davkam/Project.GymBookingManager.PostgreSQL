@@ -86,7 +86,7 @@ namespace Gym_Booking_Manager.Reservations
             else
             {
                 Customer customer = (Customer)user;
-                if (customer.isMember) NewReservationUserMember(customer.id);
+                if (customer.isSub) NewReservationUserMember(customer.id);
                 else NewReservationUserNonMember(customer.id);
             }
         }

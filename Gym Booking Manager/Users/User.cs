@@ -72,7 +72,7 @@ namespace Gym_Booking_Manager.Users
                         if (user is Customer)
                         {
                             Customer saveUser = (Customer)user;
-                            writer.WriteLine($"Customer;{saveUser.id};{user.firstName};{saveUser.lastName};{saveUser.ssn};{saveUser.phone};{saveUser.email};{saveUser.loginName};{saveUser.loginPass};{saveUser.subStart};{saveUser.subEnd};{saveUser.isMember}");
+                            writer.WriteLine($"Customer;{saveUser.id};{user.firstName};{saveUser.lastName};{saveUser.ssn};{saveUser.phone};{saveUser.email};{saveUser.loginName};{saveUser.loginPass};{saveUser.subStart};{saveUser.subEnd};{saveUser.isSub}");
                         }
                     }
                 }
@@ -583,7 +583,7 @@ namespace Gym_Booking_Manager.Users
                     if (user is Customer)
                     {
                         Customer customer = (Customer)user;
-                        Console.WriteLine($"{"- MEMBER:",-15}{customer.isMember}");
+                        Console.WriteLine($"{"- MEMBER:",-15}{customer.isSub}");
                         Console.WriteLine($"{"- SUB.START:",-15}{customer.subStart}");
                         Console.WriteLine($"{"- SUB.END:",-15}{customer.subStart}");
                     }
@@ -748,14 +748,14 @@ namespace Gym_Booking_Manager.Users
     {
         public DateTime subStart { get; set; }
         public DateTime subEnd { get; set; }
-        public bool isMember { get; set; }
+        public bool isSub { get; set; }
         public Customer(int id, string firstname, string lastname, string ssn, string phone, string email, string loginName, string loginPass,
                         DateTime subStart = default(DateTime), DateTime subEnd = default(DateTime), bool isMember = false)
             : base(id, firstname, lastname, ssn, phone, email, loginName, loginPass)
         {
             this.subStart = subStart;
             this.subEnd = subEnd;
-            this.isMember = isMember;
+            this.isSub = isMember;
         }
         public Customer() : base() { }
         public void AddSubscription() // NYI: ADD LOGGER!
@@ -767,7 +767,7 @@ namespace Gym_Booking_Manager.Users
             {
                 if (this.subEnd < DateTime.Now) this.subStart = DateTime.Now.Date;
                 this.subEnd = DateTime.Now.AddDays(1).Date;
-                this.isMember = true;
+                this.isSub = true;
 
                 Console.WriteLine($"\n>> Successfully added a \"One-Day\" subscription plan to {this.lastName}.");
                 Console.WriteLine($">> New subscription: {this.subStart.Date} - {this.subEnd.Date}");
@@ -776,7 +776,7 @@ namespace Gym_Booking_Manager.Users
             {
                 if (this.subEnd < DateTime.Now) this.subStart = DateTime.Now.Date;
                 this.subEnd = DateTime.Now.AddMonths(1).Date;
-                this.isMember = true;
+                this.isSub = true;
 
                 Console.WriteLine($"\n>> Successfully added a \"One-Month\" subscription plan to {this.lastName}.");
                 Console.WriteLine($">> New subscription: {this.subStart.Date} - {this.subEnd.Date}");
@@ -785,7 +785,7 @@ namespace Gym_Booking_Manager.Users
             {
                 if (this.subEnd < DateTime.Now) this.subStart = DateTime.Now.Date;
                 this.subEnd = DateTime.Now.AddYears(1).Date;
-                this.isMember = true;
+                this.isSub = true;
 
                 Console.WriteLine($"\n>> Successfully added a \"One-Year\" subscription plan to {this.lastName}.");
                 Console.WriteLine($">> New subscription: {this.subStart.Date} - {this.subEnd.Date}");
