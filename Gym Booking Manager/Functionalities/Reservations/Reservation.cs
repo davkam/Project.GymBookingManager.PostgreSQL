@@ -1,6 +1,5 @@
 ﻿using Gym_Booking_Manager.Dates;
 using Gym_Booking_Manager.Reservables;
-using Gym_Booking_Manager.Schedules;
 using Gym_Booking_Manager.Users;
 
 namespace Gym_Booking_Manager.Reservations
@@ -11,8 +10,8 @@ namespace Gym_Booking_Manager.Reservations
         public static List<Reservation> reservations = new List<Reservation>();
 
         public int id { get; set; }
-        public User owner { get; set; }
-        public Date date { get; set; }
+        public User? owner { get; set; }
+        public Date? date { get; set; }
         public List<Reservable>? reservables { get; set; }
 
         public Reservation(int id, User owner, Date date, List<Reservable>? reservables = default(List<Reservable>))
@@ -99,7 +98,7 @@ namespace Gym_Booking_Manager.Reservations
             bool overlap = false;
             List<int> reservableToList = new List<int>();
             DateTime[] date = new DateTime[2];
-            Schedule.DateSelecter(date);
+            Date.DateSelecter(date);
             for (int i = 0; i < Reservable.reservables.Count(); i++)
             {
                 overlap = false;
@@ -121,7 +120,7 @@ namespace Gym_Booking_Manager.Reservations
             bool overlap = false;
             List<int> ReservableToList = new List<int>();
             DateTime[] date = new DateTime[2];
-            Schedule.DateSelecter(date);
+            Date.DateSelecter(date);
             for (int i = 0; i < Reservable.reservables.Count(); i++)
             {
                 overlap = false;
@@ -143,7 +142,7 @@ namespace Gym_Booking_Manager.Reservations
             bool overlap = false;
             List<int> ReservableToList = new List<int>();
             DateTime[] date = new DateTime[2];
-            Schedule.DateSelecter(date);
+            Date.DateSelecter(date);
             for (int i = 0; i < Reservable.reservables.Count(); i++)
             {
                 overlap = false;

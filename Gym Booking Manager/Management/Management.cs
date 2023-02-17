@@ -138,7 +138,7 @@ namespace Gym_Booking_Manager.Managements
             return pass;
         }
     }
-    public class Run
+    public class RunAsync
     {
         // BACKGROUND DATE CHECKING METHODS:
             // CUSTOMER SUBSCRIPTION CHECKER!

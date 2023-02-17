@@ -4,7 +4,6 @@ using Gym_Booking_Manager.Dates;
 using Gym_Booking_Manager.Managements;
 using Gym_Booking_Manager.Reservables;
 using Gym_Booking_Manager.Reservations;
-using Gym_Booking_Manager.Schedules;
 
 namespace Gym_Booking_Manager.Users
 {

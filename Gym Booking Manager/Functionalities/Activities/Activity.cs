@@ -2,7 +2,6 @@
 using Gym_Booking_Manager.Dates;
 using Gym_Booking_Manager.Reservables;
 using Gym_Booking_Manager.Reservations;
-using Gym_Booking_Manager.Schedules;
 using Gym_Booking_Manager.Users;
 using System.Globalization;
 
@@ -136,7 +135,7 @@ namespace Gym_Booking_Manager.Activities
             bool overlap = false;
             List<int> reservableToList = new List<int>();
             DateTime[] date = new DateTime[2];
-            Schedule.DateSelecter(date);
+            Date.DateSelecter(date);
             for (int i = 0; i < Reservable.reservables.Count(); i++)
             {
                 overlap = false;
