@@ -84,7 +84,6 @@ namespace Gym_Booking_Manager.Reservations
         {
             Console.Clear();
             Console.WriteLine("<< NEW RESERVATION >>\n");
-            Console.WriteLine(">> Select an available reservable:");
 
             if (user is Staff) NewReservationStaff(user.id);
             else
