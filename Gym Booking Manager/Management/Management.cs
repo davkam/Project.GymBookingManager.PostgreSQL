@@ -142,6 +142,7 @@ namespace Gym_Booking_Manager.Managements
     {
         // BACKGROUND DATE CHECKING METHODS:
             // CUSTOMER SUBSCRIPTION CHECKER!
+            // ACTIVITY/RESERVATION NOTIFICATION SENDER!
             // RESERVATION/ACTIVITIES REMOVER!
             // RESERVABLE AVAILABILITY CHECKER!
             // ...
