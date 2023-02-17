@@ -1,4 +1,6 @@
-﻿using Gym_Booking_Manager.Reservables;
+﻿using Gym_Booking_Manager.ActivityExtenstion;
+using Gym_Booking_Manager.Dates;
+using Gym_Booking_Manager.Reservables;
 using Gym_Booking_Manager.Reservations;
 using Gym_Booking_Manager.Schedules;
 using Gym_Booking_Manager.Users;
@@ -9,20 +11,20 @@ namespace Gym_Booking_Manager.Activities
     public class Activity
     {
         public static int getActivityID;
-        public static List<Activity> activities = new List<Activity>();
+        public static List<Activity>? activities = new List<Activity>();
 
         public int id { get; set; }
-        public string name { get; set; }
-        public string description { get; set; }
+        public string? name { get; set; }
+        public string? description { get; set; }
         public bool open { get; set; }
         public int limit { get; set; }
-        public Staff instructor { get; set; }
-        public Schedule date { get; set; }
-        public Reservation reservation { get; set; }
+        public Staff? instructor { get; set; }
+        public Date? date { get; set; }
+        public Reservation? reservation { get; set; }
         public List<Customer>? participants { get; set; }
 
         public Activity(int id, string name, string description, bool open, int limit,
-            Staff instructor, Schedule date, Reservation reservation, List<Customer>? participants = default(List<Customer>))
+            Staff instructor, Date date, Reservation reservation, List<Customer>? participants = default(List<Customer>))
         {
             this.id = id;
             this.name = name;
@@ -34,6 +36,7 @@ namespace Gym_Booking_Manager.Activities
             this.reservation = reservation;
             this.participants = participants;
         }
+        public Activity() { }
         public static void LoadActivities()
         {
             try
@@ -56,7 +59,7 @@ namespace Gym_Booking_Manager.Activities
                         }
                     }
                     var staff = (Staff)User.users.Find(u => u.id == int.Parse(stringsA[5]));
-                    var schedule = new Schedule(DateTime.Parse(stringsA[6]), DateTime.Parse(stringsA[7]));
+                    var schedule = new Date(DateTime.Parse(stringsA[6]), DateTime.Parse(stringsA[7]));
                     var reservation = Reservation.reservations.Find(r => r.id == int.Parse(stringsA[8]));
                     var activity = new Activity(int.Parse(stringsA[0]), stringsA[1], stringsA[2], bool.Parse(stringsA[3]), int.Parse(stringsA[4]), staff, schedule, reservation, participants);
                     activities.Add(activity);
@@ -127,9 +130,9 @@ namespace Gym_Booking_Manager.Activities
             }
             Reservation.SaveReservations();
         }
-        public static void NewActivity(int idStaff) // TBD: Parameter to Staff!
+        public static void NewActivity(Staff staff) // TBD: Parameter to Staff!
         {
-            int id = GetActivityID(); string Name; string Description; bool Open = true; int participantsNo = 0; Staff Instructor = User.users[idStaff] as Staff; List<Customer>? Participants=new List<Customer>();
+            int id = GetActivityID(); string Name; string Description; bool Open = true; int participantsNo = 0; Staff Instructor = staff; List<Customer>? Participants=new List<Customer>();
             bool overlap = false;
             List<int> reservableToList = new List<int>();
             DateTime[] date = new DateTime[2];
@@ -148,7 +151,7 @@ namespace Gym_Booking_Manager.Activities
                 }
                 if (!overlap && Reservable.reservables[i] is Space) reservableToList.Add(Reservable.reservables[i].id);
             }
-            ChooseSpace(idStaff, date, reservableToList);
+            ChooseSpace(staff, date, reservableToList);
             reservableToList.Clear();
             for (int i = 0; i < Reservable.reservables.Count(); i++)
             {
@@ -184,7 +187,7 @@ namespace Gym_Booking_Manager.Activities
             {            
             Console.Write($"Enter participant limit(max={Limit}): ");
             Console.WriteLine();
-            string input = Console.ReadLine();
+            string? input = Console.ReadLine();
             int.TryParse( input, out participantsNo);
             if(participantsNo > 0 && participantsNo<= Limit)
                 {
@@ -193,11 +196,11 @@ namespace Gym_Booking_Manager.Activities
             else Console.WriteLine("Incorrect input!");
             }
             Reservation Reservationn = Reservation.reservations[Reservation.reservations.Count() - 1];
-            Schedule datee = new Schedule(date[0], date[1]); 
+            Date datee = new Date(date[0], date[1]); 
             Activity.activities.Add(new Activity(id, Name, Description, Open, participantsNo, Instructor, datee, Reservationn, Participants));
             SaveActivities();
         }
-        static void ChooseSpace(int idStaff, DateTime[] date, List<int> reservableToList) // TBD: Parameter to Staff!
+        static void ChooseSpace(Staff staff, DateTime[] date, List<int> reservableToList) // TBD: Parameter to Staff!
         {
             List<Reservable> list = new List<Reservable>();
             Console.WriteLine("Available Spaces: ");
@@ -216,7 +219,7 @@ namespace Gym_Booking_Manager.Activities
                 {
                     list.Add(Reservable.reservables[reservableToList[number - 1]]);
                     Console.WriteLine("You have booked " + Reservable.reservables[reservableToList[number - 1]].name);
-                    Reservation.reservations.Add(new Reservation(Reservation.GetReservationID(), User.users[idStaff], new Schedule(date[0], date[1]), list));
+                    Reservation.reservations.Add(new Reservation(Reservation.GetReservationID(), staff, new Date(date[0], date[1]), list));
                     Reservation.SaveReservations();
                     break;
                 }
@@ -230,7 +233,7 @@ namespace Gym_Booking_Manager.Activities
         {
             // Staff edits activites.
         }
-        public static void DeleteActivity() // TBD: Add Staff parameter.
+        public static void DeleteActivity(Staff staff) // TBD: Add Staff parameter.
         {
             int i = 0;
             Console.WriteLine("Which activity do you want to delete? (0 to exit)");
@@ -250,74 +253,107 @@ namespace Gym_Booking_Manager.Activities
             else Console.WriteLine("Incorrect input");
             Thread.Sleep(2000);
         }
-        public static void BookActivity(int week, int ID)   //TBD: Parameter to Customer.
+        public static void RegisterActivity(Customer customer)
         {
-            Customer customer = (Customer)User.users[ID];
-            bool printedSomething = false;
-            List<Activity> weekActivities = Activity.activities.Where(a => ISOWeek.GetWeekOfYear(a.date.timeFrom) == week).ToList();
-            Console.WriteLine("Which activity do you want to book? (type in the number from the listed activites)");
-            string input = Console.ReadLine();
-            int.TryParse(input, out var which);
-            foreach (Activity a in weekActivities)
+            Console.Clear();
+            Console.WriteLine("<< ACTIVITY REGISTRATION >>\n");
+
+            ActivityExt.ActivityCalendarMenu(false);
+            
+            Console.Write("\n>> Enter ID of activity to register: ");
+            string? input = Console.ReadLine();
+            int.TryParse(input, out var result);
+
+            var getActivity = new Activity();
+            foreach (Activity a in activities)
             {
-                if (a.id == which && a.limit > a.participants.Count() && customer.subStart < a.date.timeFrom && customer.subEnd > a.date.timeTo && Activity.activities[a.id].participants.Contains(User.users[ID]) == false)
+                if (a.id == result && a.limit > a.participants.Count() && customer.subEnd > a.date.timeFrom && a.participants.Contains(customer) == false)
                 {
-                    Console.WriteLine($"{a.name} booked!");
-                    Activity.activities[a.id].participants.Add(customer);
+                    Console.WriteLine($">> Register for activity \"{a.name}\"?");
+                    Console.WriteLine(">> Press any key to continue or [ESC] to exit.");
+                    ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                    if (keyInfo.Key == ConsoleKey.Escape)
+                    {
+                        Console.WriteLine(">> Activity registration cancelled!");
+                        Task.Delay(1500).Wait();
+                        return;
+                    }
+                    a.participants.Add(customer);
+                    Console.WriteLine(">> Activity registration successful!");
                 }
-                else if (a.id == which && a.limit == a.participants.Count() && customer.subStart < a.date.timeFrom && customer.subEnd > a.date.timeTo && Activity.activities[a.id].participants.Contains(User.users[ID]) == false)
+                else if (a.id == result && a.limit <= a.participants.Count() && customer.subEnd > a.date.timeFrom && a.participants.Contains(customer) == false)
                 {
-                    Console.WriteLine("The activity is fully booked");
+                    Console.WriteLine(">> Activity full, registration cancelled!");
                 }
-                else if (a.id == which && Activity.activities[a.id].participants.Contains(User.users[ID]) == true)
+                else if (a.id == result && a.participants.Contains(customer) == true)
                 {
-                    Console.WriteLine("You are already booked to this activity");
+                    Console.WriteLine(">> Activity already registered, registration cancelled!");
                 }
-                else if (a.id == which && customer.subStart > a.date.timeFrom || a.id == which && customer.subEnd < a.date.timeTo)
+                else if (a.id == result && customer.subEnd < a.date.timeFrom)
                 {
-                    Console.WriteLine("You do not have an active subscription for the date of this activity");
+                    Console.WriteLine(">> Activity date is later than subscription, registration cancelled!");
                 }
             }
-            Activity.SaveActivities();
+            SaveActivities();
+            Task.Delay(1500).Wait();
         }
-        public static void ActivityCancel(int ID)   //TBD: Parameter to Customer.
+        public static void DeregisterActivity(Customer customer)   // CHECK!!
         {
-            int findSpotInList=0;
             int result;
-            List<int> whichActivity=new List<int>();
-            int counter = 1;
-            Console.WriteLine("You are booked for the following activities: ");
-            foreach (Activity a in Activity.activities)
+            int index = 1;
+            List<int>? registeredActivityIDs = new();
+            Activity? deregisterActivity = new();
+
+            Console.Clear();
+            Console.WriteLine("<< ACTIVITY DEREGISTRATION >>\n");
+            Console.WriteLine($">> Registered activities: {customer.firstName} {customer.firstName}\n");
+            
+            foreach (Activity a in activities)
             {
-                if (a.participants.Contains(User.users[ID]))
+                if (a.participants.Contains(customer))
                 {
-                    Console.WriteLine(counter+" "+a.name+" on "+a.date.timeFrom);
-                    whichActivity.Add(a.id);
-                    counter++;
+                    Console.WriteLine($"- {index}. ACTIVITY: {a.name}  DATE: {a.date.timeFrom}");
+                    registeredActivityIDs.Add(a.id);
+                    index++;
                 }
             }
-            Console.WriteLine();
-            Console.WriteLine("Which do you want to cancel?(0 to exit otherwise enter the number of the one you want to cancel)");
-            string input = Console.ReadLine();
+            Console.Write("\n>> Enter number of activity to deregister (\"0\" to exit): ");
+            string? input = Console.ReadLine();
             int.TryParse(input, out result);
-            if (result == 0) Console.WriteLine("Goodbye");
-            else if (result > 0 && result < whichActivity.Count())
+            deregisterActivity = activities.Find(a => a.id == registeredActivityIDs[result - 1]);
+
+            if (result == 0) Console.WriteLine(">> Activity deregistration cancelled!");
+            else if (result > 0 && result < registeredActivityIDs.Count())
             {
-                Console.WriteLine("You have removed yourself from activity: " + activities[whichActivity[result-1]].name);
-                
-                foreach(Customer customer in activities[whichActivity[result - 1]].participants)
-                {
-                    if (customer.id == ID) break;
-                    findSpotInList++;
-                }
-                activities[whichActivity[result - 1]].participants.RemoveAt(findSpotInList);
+                deregisterActivity.participants.Remove(customer);
+
+                Console.WriteLine($">> Activity {deregisterActivity.name} successfully deregistered!");
                 SaveActivities();
             }
-            else Console.WriteLine("Incorrect selection, bye!");
+            else Console.WriteLine(">> Invalid input, activity deregistration cancelled!");
+            Task.Delay(1500).Wait();
         }
-        public static void ActivityView(int ID) //TBD: Parameter to Customer.
+        public static void ViewRegisteredActivities(Customer customer) // CHECK!!
         {
-            Schedule.ViewScheduleMenu(ID);
+            Console.Clear();
+            Console.WriteLine("<< REGISTERED ACTIVITIES >>\n");
+            Console.WriteLine($">> {customer.firstName} {customer.lastName}'s registered activities:");
+            
+            foreach (Activity a in activities)
+            {
+                if (a.participants.Contains(customer))
+                {
+                    Console.WriteLine($"\n- ID:           {a.id}");
+                    Console.WriteLine($"- NAME:         {a.name}");
+                    Console.WriteLine($"- DESCRIPTION:  {a.description}");
+                    Console.WriteLine($"- INSTRUCTOR:   {a.instructor.firstName} {a.instructor.lastName}");
+                    Console.WriteLine($"- PARTICIPANTS: {a.participants.Count()}({a.limit})");
+                    Console.WriteLine($"- DATE:         {a.date.timeFrom} - {a.date.timeTo}");
+
+                }
+            }
+            Console.WriteLine("\n>> Press any key to continue.");
+            Console.ReadKey(true);
         }
     }
 }

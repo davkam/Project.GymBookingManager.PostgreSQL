@@ -1,4 +1,5 @@
-﻿using Gym_Booking_Manager.Reservables;
+﻿using Gym_Booking_Manager.Dates;
+using Gym_Booking_Manager.Reservables;
 using Gym_Booking_Manager.Schedules;
 using Gym_Booking_Manager.Users;
 
@@ -11,10 +12,10 @@ namespace Gym_Booking_Manager.Reservations
 
         public int id { get; set; }
         public User owner { get; set; }
-        public Schedule date { get; set; }
+        public Date date { get; set; }
         public List<Reservable>? reservables { get; set; }
 
-        public Reservation(int id, User owner, Schedule date, List<Reservable>? reservables = default(List<Reservable>))
+        public Reservation(int id, User owner, Date date, List<Reservable>? reservables = default(List<Reservable>))
         {
             this.id = id;
             this.owner = owner;
@@ -44,7 +45,7 @@ namespace Gym_Booking_Manager.Reservations
                     }
 
                     var owner = User.users.Find(u => u.id == int.Parse(stringsA[1]));
-                    var schedule = new Schedule(DateTime.Parse(stringsA[2]), DateTime.Parse(stringsA[3]));
+                    var schedule = new Date(DateTime.Parse(stringsA[2]), DateTime.Parse(stringsA[3]));
                     var reservation = new Reservation(int.Parse(stringsA[0]), owner, schedule, reservables);
                     reservations.Add(reservation);
                 }
@@ -183,7 +184,7 @@ namespace Gym_Booking_Manager.Reservations
                 {
                     list.Add(Reservable.reservables[ReservableToList[number - 1]]);
                     Console.WriteLine("You have booked " + Reservable.reservables[ReservableToList[number - 1]].name);
-                    reservations.Add(new Reservation(GetReservationID(), User.users[userID], new Schedule(date[0], date[1]), list));
+                    reservations.Add(new Reservation(GetReservationID(), User.users[userID], new Date(date[0], date[1]), list));
                     SaveReservations();
                     break;
                 }

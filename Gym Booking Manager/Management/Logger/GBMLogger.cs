@@ -1,4 +1,4 @@
-﻿namespace Gym_Booking_Manager.Logger
+﻿namespace Gym_Booking_Manager.Management.Logger
 {
     public class GBMLogger
     {
