@@ -6,7 +6,7 @@ Equipment;3;Treadmill;Specialized treadmill.;true;false
 Equipment;4;Trampoline;Big trampoline.;true;false
 Space;5;Hall;Hall for group activities.;true;20
 Space;6;Hall;Hall for group activities.;false;30
-Space;7;Studio;Space for sport activities.;false
+Space;7;Studio;Space for sport activities.;false;10
 Space;8;Lane;Lane for bowling.;true;10
 Space;9;Lane;Lane for running.;false;15
 PTrainer;10;false;1

@@ -597,10 +597,10 @@ namespace Gym_Booking_Manager.Users
             }
         }
         protected virtual void UserManagerMenu() { }
-        protected virtual void ActivityManagerMenu() { }
-        protected virtual void ReservationManagerMenu() { }
-        protected virtual void ReservableManagerMenu() { }
-        protected virtual void SubscriptionManagerMenu() { }
+        protected virtual void ActivitiesMenu() { }
+        protected virtual void ReservationsMenu() { }
+        protected virtual void ReservablesMenu() { }
+        protected virtual void SubscriptionsMenu() { }
         protected void AccountManagerMenu()
         {
             Console.Clear();
@@ -688,7 +688,7 @@ namespace Gym_Booking_Manager.Users
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
             Task.Delay(1000).Wait();
         }
-        protected override void ActivityManagerMenu()
+        protected override void ActivitiesMenu()
         {
             Console.Clear();
             Console.WriteLine("<< ACTIVITY MANAGER >>\n");
@@ -705,13 +705,13 @@ namespace Gym_Booking_Manager.Users
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
             Task.Delay(1000).Wait();
         }
-        protected override void ReservableManagerMenu()
+        protected override void ReservablesMenu()
         {
             Console.Clear();
-            Console.WriteLine("<< RESERVABLE MANAGER >>\n");
-            Console.WriteLine("- [1]   Register a reservable.");
-            Console.WriteLine("- [2]   Deregister a reservable.");
-            Console.WriteLine("- [3]   Edit a reservable.");
+            Console.WriteLine("<< RESERVABLES >>\n");
+            Console.WriteLine("- [1]   New reservable.");
+            Console.WriteLine("- [2]   Delete reservable.");
+            Console.WriteLine("- [3]   Edit reservable.");
             Console.WriteLine("- [4]   View all reservables.");
             Console.WriteLine("- [ESC] Exit.");
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
@@ -720,7 +720,7 @@ namespace Gym_Booking_Manager.Users
             else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) Reservable.DeleteReservable(this);
             else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) Reservable.EditReservable(this);
             else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) Reservable.ViewAllReservables();
-            else if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> Reservable manager cancelled!");
+            else if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> Reservables cancelled!");
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
             Task.Delay(1000).Wait();
         }
@@ -737,9 +737,9 @@ namespace Gym_Booking_Manager.Users
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
                 if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) UserManagerMenu();
-                else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) ActivityManagerMenu();
-                else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) ReservationManagerMenu();
-                else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) ReservableManagerMenu();
+                else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) ActivitiesMenu();
+                else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) ReservationsMenu();
+                else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) ReservablesMenu();
                 else if (keyInfo.Key == ConsoleKey.D5 || keyInfo.Key == ConsoleKey.NumPad5) AccountManagerMenu();
                 else if (keyInfo.Key == ConsoleKey.Escape)
                 {
@@ -856,44 +856,61 @@ namespace Gym_Booking_Manager.Users
             Console.WriteLine("\n>> Press any key to continue.");
             Console.ReadKey(true);
         }
-        protected override void ActivityManagerMenu()
+        protected override void ActivitiesMenu()
         {
             Console.Clear();
-            Console.WriteLine("<< ACTIVITY MANAGER >>\n");
-            Console.WriteLine("- [1]   Register for an activity. (NYI)");
-            Console.WriteLine("- [2]   Deregister for an activity.(NYI)");
-            Console.WriteLine("- [3]   View all activities.");
+            Console.WriteLine("<< ACTIVITIES >>\n");
+            Console.WriteLine("- [1]   Register an activity. (NYI)");
+            Console.WriteLine("- [2]   Deregister an activity.(NYI)");
+            Console.WriteLine("- [3]   View registered activities.");
+            Console.WriteLine("- [4]   View all activities.");
             Console.WriteLine("- [ESC] Exit.");
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
             if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) return;
             else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) return;
-            else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) Schedule.ViewScheduleMenu();
-            else if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> Activity manager cancelled!");
+            else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) return;
+            else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) Schedule.ViewScheduleMenu();
+            else if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> Activities cancelled!");
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
             Task.Delay(1000).Wait();
         }
-        protected override void ReservationManagerMenu()
+        protected override void ReservationsMenu()
         {
             Console.Clear();
-            Console.WriteLine("<< RESERVATION MANAGER >>\n");
-            Console.WriteLine("- [1]   Register a reservation.");
-            Console.WriteLine("- [2]   Deregister a reservation.");
-            Console.WriteLine("- [3]   View all reservations.");
+            Console.WriteLine("<< RESERVATIONS >>\n");
+            Console.WriteLine("- [1]   New reservation.");
+            Console.WriteLine("- [2]   Delete reservation.");
+            Console.WriteLine("- [3]   View reservations.");
             Console.WriteLine("- [ESC] Exit.");
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
             if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) Reservation.NewReservation(this);
             else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) Reservation.DeleteReservation(this);
             else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) Reservation.ViewReservations(this);
-            else if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> Reservation manager cancelled!");
+            else if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> Reservations cancelled!");
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
             Task.Delay(1000).Wait();
         }
-        protected override void SubscriptionManagerMenu()
+        protected override void ReservablesMenu()
         {
             Console.Clear();
-            Console.WriteLine("<< SUBSCRIPTION MENU >>\n");
+            Console.WriteLine("<< RESERVABLES >>\n");
+            Console.WriteLine("- [1]   View available reservables.");
+            Console.WriteLine("- [2]   View all reservables.");
+            Console.WriteLine("- [ESC] Exit.");
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+
+            if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) Reservable.ViewAvailableReservables();
+            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) Reservable.ViewAllReservables();
+            else if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> Reservables cancelled!");
+            else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
+            Task.Delay(1000).Wait();
+        }
+        protected override void SubscriptionsMenu()
+        {
+            Console.Clear();
+            Console.WriteLine("<< SUBSCRIPTION >>\n");
             Console.WriteLine($">> LOGGED IN: {firstName} {lastName}");
             Console.WriteLine("\n>> Select an option!");
             Console.WriteLine($"{"- [1]",-8}Add subscription.\n{"- [2]",-8}View subscription.\n{"- [ESC]",-8}Log out.");
@@ -903,13 +920,13 @@ namespace Gym_Booking_Manager.Users
             else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) ViewSubscription();
             else if (keyInfo.Key == ConsoleKey.Escape)
             {
-                Console.WriteLine($">> View subscription cancelled!");
+                Console.WriteLine($">> Subcription cancelled!");
                 Task.Delay(1500).Wait();
                 return;
             }
             else
             {
-                Console.WriteLine($">> INVALID KEY: [KEY.{keyInfo.Key}], view subscription cancelled!");
+                Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]. Subcription cancelled!");
                 Task.Delay(1500).Wait();
                 return;
             }
@@ -925,28 +942,21 @@ namespace Gym_Booking_Manager.Users
                     Console.WriteLine("<< CUSTOMER MENU >>\n");
                     Console.WriteLine($">> LOGGED IN: {firstName} {lastName}");
                     Console.WriteLine("\n>> Select an option!");
-                    Console.WriteLine($"{"- [1]",-8}Manage activities.\n{"- [2]",-8}Manage reservations.\n{"- [3]",-8}Manage subscription.\n{"- [4]",-8}Manage account.\n{"- [ESC]",-8}Log out.");
+                    Console.WriteLine($"{"- [1]",-8}Activities.\n{"- [2]",-8}Reservations.\n{"- [3]",-8}Reservables.\n{"- [4]",-8}Subscription.\n{"- [5]",-8}Account.\n{"- [ESC]",-8}Log out.");
                     ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
-                    if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1)
-                    {
-                        if (isSub) ActivityManagerMenu();
-                        else
-                        {
-                            Console.WriteLine(">> User not subscribed, or subscription has ended.");
-                            Task.Delay(1500).Wait();
-                        }
-                    }
-                    else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) ReservationManagerMenu();
-                    else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) SubscriptionManagerMenu();
-                    else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) AccountManagerMenu();
+                    if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) ActivitiesMenu();
+                    else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) ReservationsMenu();
+                    else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) ReservablesMenu();
+                    else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) SubscriptionsMenu();
+                    else if (keyInfo.Key == ConsoleKey.D5 || keyInfo.Key == ConsoleKey.NumPad5) AccountManagerMenu();
                     else if (keyInfo.Key == ConsoleKey.Escape)
                     {
                         Console.WriteLine($"\n>> LOGGED OUT: {firstName} {lastName}");
                         Task.Delay(1000).Wait();
                         cancel = true;
                     }
-                    else Console.WriteLine($">> INVALID KEY: [KEY.{keyInfo.Key}]");
+                    else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
                 }
             }
             else
@@ -956,18 +966,18 @@ namespace Gym_Booking_Manager.Users
                     Console.Clear();
                     Console.WriteLine("<< GUEST MENU >>\n");
                     Console.WriteLine(">> Select an option!");
-                    Console.WriteLine($"{"- [1]",-8}View activities.\n{"- [2]",-8}View reservables.\n{"- [ESC]",-8}Log out.");
+                    Console.WriteLine($"{"- [1]",-8}Activities.\n{"- [2]",-8}Reservables.\n{"- [ESC]",-8}Log Out.");
                     ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
-                    if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) ; //NYI
-                    else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) ; //NYI
+                    if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) ActivitiesMenu();
+                    else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) ReservablesMenu();
                     else if (keyInfo.Key == ConsoleKey.Escape)
                     {
-                        Console.WriteLine($"\n>> LOGGED OUT GUEST!");
+                        Console.WriteLine($"\n>> LOGGED OUT: Guest");
                         Task.Delay(1000).Wait();
                         cancel = true;
                     }
-                    else Console.WriteLine($">> INVALID KEY: [KEY.{keyInfo.Key}]");
+                    else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
                 }
             }
         }

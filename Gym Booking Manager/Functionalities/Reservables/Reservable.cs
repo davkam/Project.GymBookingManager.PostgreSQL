@@ -1,5 +1,6 @@
 ﻿using Gym_Booking_Manager.Reservations;
 using Gym_Booking_Manager.Users;
+using System.Reflection.PortableExecutable;
 
 namespace Gym_Booking_Manager.Reservables
 {
@@ -42,7 +43,7 @@ namespace Gym_Booking_Manager.Reservables
                     }
                     if (strings[0] == "PTrainer")
                     {
-                        Staff staff = (Staff)User.users.Find(u => u.id == int.Parse(strings[3]));
+                        var staff = (Staff)User.users.Find(u => u.id == int.Parse(strings[3]));
                         var ptrainer = new PTrainer(int.Parse(strings[1]), bool.Parse(strings[2]), staff);
                         reservables.Add(ptrainer);
                     }
@@ -574,9 +575,63 @@ namespace Gym_Booking_Manager.Reservables
             Console.WriteLine("\n>> NOT YET IMPLEMENTED!");
             Task.Delay(1500).Wait();
         }
-        public static void ViewAvailableReservables()
+        public static void ViewAvailableReservables(bool header = true, bool footer = true)
         {
+            string typeReservable = "Equipment";
+            int x, y;
 
+            if (header)
+            {
+                Console.Clear();
+                Console.WriteLine($"{"<< VIEW AVAILABLE RESERVABLES >>",64}\n");
+            }
+            reservables.Sort((x, y) => x.GetType().Name.CompareTo(y.GetType().Name));
+            (x, y) = Console.GetCursorPosition();
+
+            foreach (Reservable rsvb in reservables)
+            {
+                if (typeReservable != rsvb.GetType().Name || x >= 120)
+                {
+                    x = 0;
+                    y += 6;
+                }
+
+                if (rsvb.isAvailable)
+                {
+                    Console.SetCursorPosition(x, y);
+                    Console.Write($"- TYPE: {rsvb.GetType().Name}");
+                    Console.SetCursorPosition(x, y + 1);
+                    Console.Write($"- ID:   {rsvb.id}");
+                    Console.SetCursorPosition(x, y + 2);
+                    Console.Write($"- NAME: {rsvb.name}");
+                    Console.SetCursorPosition(x, y + 3);
+                    Console.Write($"- DESCRIPTION:");
+                    Console.SetCursorPosition(x, y + 4);
+                    if (rsvb.description.Length > 26) Console.Write($" \"{rsvb.description[0..23] + "..."}\"");
+                    else Console.Write($" \"{rsvb.description}\"");
+
+                    x += 30;
+                    typeReservable = rsvb.GetType().Name;
+                }
+            }
+            Console.WriteLine();
+
+            if (footer)
+            {
+                int id = -1;
+                Console.WriteLine("\n>> Press any key to continue, or [V] to view details of a reservable.");
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.V)
+                {
+                    try
+                    {
+                        Console.Write(">> Enter ID of reservable to view: ");
+                        id = int.Parse(Console.ReadLine());
+                    }
+                    catch { return; }
+                }
+                if (id != -1) ViewReservable(id);
+            }
         }
         public static void ViewAllReservables(bool header = true, bool footer = true)
         {
