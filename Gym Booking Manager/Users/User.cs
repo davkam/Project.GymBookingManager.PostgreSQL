@@ -596,15 +596,15 @@ namespace Gym_Booking_Manager.Users
                 Console.ReadKey(true);
             }
         }
-        protected virtual void UserManagerMenu() { }
+        protected virtual void UserMenu() { }
         protected virtual void ActivitiesMenu() { }
         protected virtual void ReservationsMenu() { }
         protected virtual void ReservablesMenu() { }
         protected virtual void SubscriptionsMenu() { }
-        protected void AccountManagerMenu()
+        protected void AccountMenu()
         {
             Console.Clear();
-            Console.WriteLine("<< ACCOUNT MANAGER >>\n");
+            Console.WriteLine("<< ACCOUNT >>\n");
             Console.WriteLine("- [1]   Update personal information.");
             Console.WriteLine("- [2]   Update login details.");
             Console.WriteLine("- [3]   View personal information. (SENSITIVE INFORMATION)");
@@ -614,7 +614,7 @@ namespace Gym_Booking_Manager.Users
             if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) UpdateInfo();
             else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) UpdateLogin();
             else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) ViewInfo();
-            else if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> Account manager cancelled!");
+            else if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> Account cancelled!");
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
             Task.Delay(1000).Wait();
         }
@@ -625,7 +625,7 @@ namespace Gym_Booking_Manager.Users
         public Admin(int id, string firstname, string lastname, string ssn, string phone, string email, string loginName, string loginPass)
             : base(id, firstname, lastname, ssn, phone, email, loginName, loginPass) { }
         public Admin() : base() { }
-        protected override void UserManagerMenu()
+        protected override void UserMenu()
         {
             Console.Clear();
             Console.WriteLine("<< USER MANAGER >>\n");
@@ -651,10 +651,10 @@ namespace Gym_Booking_Manager.Users
                 Console.WriteLine("<< ADMIN MENU >>\n");
                 Console.WriteLine($">> LOGGED IN: {firstName} {lastName}");
                 Console.WriteLine("\n>> Select an option!");
-                Console.WriteLine($"{"- [1]",-8}Manage users.\n{"- [2]",-8}View log activities.\n{"- [ESC]",-8}Log out.");
+                Console.WriteLine($"{"- [1]",-8}Users.\n{"- [2]",-8}Log.\n{"- [ESC]",-8}Log out.");
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
-                if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) UserManagerMenu();
+                if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) UserMenu();
                 else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) ; //ViewLog()
                 else if (keyInfo.Key == ConsoleKey.Escape)
                 {
@@ -671,7 +671,7 @@ namespace Gym_Booking_Manager.Users
         public Staff(int id, string firstname, string lastname, string ssn, string phone, string email, string loginName, string loginPass)
             : base(id, firstname, lastname, ssn, phone, email, loginName, loginPass) { }
         public Staff() : base() { }
-        protected override void UserManagerMenu()
+        protected override void UserMenu()
         {
             Console.Clear();
             Console.WriteLine("<< CUSTOMER MANAGER >>\n");
@@ -733,14 +733,14 @@ namespace Gym_Booking_Manager.Users
                 Console.WriteLine("<< STAFF MENU >>\n");
                 Console.WriteLine($">> LOGGED IN: {firstName} {lastName}");
                 Console.WriteLine("\n>> Select an option!");
-                Console.WriteLine($"{"- [1]",-8}Manage customers.\n{"- [2]",-8}Manage activities.\n{"- [3]",-8}Manage reservations.\n{"- [4]",-8}Manage reservables.\n{"- [5]",-8}Manage account.\n{"- [ESC]",-8}Log out.");
+                Console.WriteLine($"{"- [1]",-8}Customers.\n{"- [2]",-8}Activities.\n{"- [3]",-8}Reservations.\n{"- [4]",-8}Reservables.\n{"- [5]",-8}Account.\n{"- [ESC]",-8}Log out.");
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
-                if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) UserManagerMenu();
+                if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) UserMenu();
                 else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) ActivitiesMenu();
                 else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) ReservationsMenu();
                 else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) ReservablesMenu();
-                else if (keyInfo.Key == ConsoleKey.D5 || keyInfo.Key == ConsoleKey.NumPad5) AccountManagerMenu();
+                else if (keyInfo.Key == ConsoleKey.D5 || keyInfo.Key == ConsoleKey.NumPad5) AccountMenu();
                 else if (keyInfo.Key == ConsoleKey.Escape)
                 {
                     Console.WriteLine($"\n>> LOGGED OUT: {firstName} {lastName}");
@@ -783,7 +783,7 @@ namespace Gym_Booking_Manager.Users
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
             if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1)
             {
-                Console.WriteLine($"\n>> Confirm new day subscription and pay {User.oneDaySubFee} euros?");
+                Console.WriteLine($"\n>> Confirm new day subscription and pay {User.oneDaySubFee} Euros?");
                 Console.WriteLine(">> Press any key to accept, or [ESC] to cancel.");
                 keyInfo = Console.ReadKey(true);
                 if (keyInfo.Key == ConsoleKey.Escape)
@@ -802,7 +802,7 @@ namespace Gym_Booking_Manager.Users
             }
             if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2)
             {
-                Console.WriteLine($"\n>> Confirm new month subscription and pay {User.oneMonthSubFee} euros?");
+                Console.WriteLine($"\n>> Confirm new month subscription and pay {User.oneMonthSubFee} Euros?");
                 Console.WriteLine(">> Press any key to accept, or [ESC] to cancel.");
                 keyInfo = Console.ReadKey(true);
                 if (keyInfo.Key == ConsoleKey.Escape)
@@ -821,7 +821,7 @@ namespace Gym_Booking_Manager.Users
             }
             if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3)
             {
-                Console.WriteLine($"\n>> Confirm new subscription and pay {User.oneYearSubFee} euros?");
+                Console.WriteLine($"\n>> Confirm new subscription and pay {User.oneYearSubFee} Euros?");
                 Console.WriteLine(">> Press any key to accept, or [ESC] to cancel.");
                 keyInfo = Console.ReadKey(true);
                 if (keyInfo.Key == ConsoleKey.Escape)
@@ -949,7 +949,7 @@ namespace Gym_Booking_Manager.Users
                     else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) ReservationsMenu();
                     else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) ReservablesMenu();
                     else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) SubscriptionsMenu();
-                    else if (keyInfo.Key == ConsoleKey.D5 || keyInfo.Key == ConsoleKey.NumPad5) AccountManagerMenu();
+                    else if (keyInfo.Key == ConsoleKey.D5 || keyInfo.Key == ConsoleKey.NumPad5) AccountMenu();
                     else if (keyInfo.Key == ConsoleKey.Escape)
                     {
                         Console.WriteLine($"\n>> LOGGED OUT: {firstName} {lastName}");

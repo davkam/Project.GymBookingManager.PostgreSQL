@@ -590,14 +590,13 @@ namespace Gym_Booking_Manager.Reservables
 
             foreach (Reservable rsvb in reservables)
             {
-                if (typeReservable != rsvb.GetType().Name || x >= 120)
-                {
-                    x = 0;
-                    y += 6;
-                }
-
                 if (rsvb.isAvailable)
                 {
+                    if (typeReservable != rsvb.GetType().Name || x >= 120)
+                    {
+                        x = 0;
+                        y += 6;
+                    }
                     Console.SetCursorPosition(x, y);
                     Console.Write($"- TYPE: {rsvb.GetType().Name}");
                     Console.SetCursorPosition(x, y + 1);

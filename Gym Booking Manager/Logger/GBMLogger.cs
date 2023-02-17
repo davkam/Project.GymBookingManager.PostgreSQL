@@ -8,6 +8,12 @@ namespace Gym_Booking_Manager.Logger
 {
     public class GBMLogger
     {
+        //public static GBMLogger dataLogger = new GBMLogger("Logger/DataLogger.txt");
+        //public static GBMLogger activityLogger = new GBMLogger("Logger/ActivityLogger.txt");
+        //public static GBMLogger reservableLogger = new GBMLogger("Logger/ReservableLogger.txt");
+        //public static GBMLogger reservationLogger = new GBMLogger("Logger/ReservationLogger.txt");
+        //public static GBMLogger userLogger = new GBMLogger("Logger/UserLogger.txt");
+
         private readonly string _logFilePath;
         public GBMLogger(string logFilePath)
         {
