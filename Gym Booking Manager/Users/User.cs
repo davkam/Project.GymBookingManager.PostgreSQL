@@ -3,8 +3,6 @@ using Gym_Booking_Manager.ManagementFunctions;
 using Gym_Booking_Manager.Reservables;
 using Gym_Booking_Manager.Reservations;
 using Gym_Booking_Manager.Schedules;
-using System.Threading.Channels;
-using System;
 
 namespace Gym_Booking_Manager.Users
 {
@@ -688,19 +686,19 @@ namespace Gym_Booking_Manager.Users
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
             Task.Delay(1000).Wait();
         }
-        protected override void ActivitiesMenu()
+        protected override void ActivitiesMenu()    // TBD: Add options!
         {
             Console.Clear();
             Console.WriteLine("<< ACTIVITY MANAGER >>\n");
             Console.WriteLine("- [1]   Register an activity.");
-            Console.WriteLine("- [2]   Deregister an activity. (NYI)");
+            Console.WriteLine("- [2]   Deregister an activity.");
             Console.WriteLine("- [3]   View all activities.");
             Console.WriteLine("- [ESC] Exit.");
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
             if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) Activity.NewActivity(this.id);
-            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) return; // NYI: Activity.DeregisterActivity
-            else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) Schedule.ViewScheduleMenu();
+            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) Activity.DeleteActivity();
+            else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) Schedule.ViewScheduleMenu(this.id);
             else if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> Activity manager cancelled!");
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
             Task.Delay(1000).Wait();
@@ -856,21 +854,22 @@ namespace Gym_Booking_Manager.Users
             Console.WriteLine("\n>> Press any key to continue.");
             Console.ReadKey(true);
         }
-        protected override void ActivitiesMenu()
+        protected override void ActivitiesMenu()    // TBD: Add/Update Options!
         {
             Console.Clear();
             Console.WriteLine("<< ACTIVITIES >>\n");
-            Console.WriteLine("- [1]   Register an activity. (NYI)");
-            Console.WriteLine("- [2]   Deregister an activity.(NYI)");
-            Console.WriteLine("- [3]   View registered activities.");
-            Console.WriteLine("- [4]   View all activities.");
+            if (this.isSub == false) Console.WriteLine("- [1]   View all activities.");
+            if (this.isSub == true) Console.WriteLine("- [1]   View and register for all activities.");
+            Console.WriteLine("- [2]   Deregister an activity.(Subscribers Only)");
+            // Console.WriteLine("- [3]   View registered activities.");
+            // Console.WriteLine("- [4]   View all activities.");
             Console.WriteLine("- [ESC] Exit.");
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
-            if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) return;
-            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) return;
-            else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) return;
-            else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) Schedule.ViewScheduleMenu();
+            if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1) Activity.ActivityView(this.id);
+            else if (keyInfo.Key == ConsoleKey.D2 || keyInfo.Key == ConsoleKey.NumPad2) Activity.ActivityCancel(this.id);
+            // else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3) ;
+            // else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4) ;
             else if (keyInfo.Key == ConsoleKey.Escape) Console.WriteLine(">> Activities cancelled!");
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
             Task.Delay(1000).Wait();

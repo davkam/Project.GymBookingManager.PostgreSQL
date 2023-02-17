@@ -1,6 +1,5 @@
 ﻿using Gym_Booking_Manager.Reservations;
 using Gym_Booking_Manager.Users;
-using System.Reflection.PortableExecutable;
 
 namespace Gym_Booking_Manager.Reservables
 {

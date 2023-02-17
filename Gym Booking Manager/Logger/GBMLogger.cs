@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Gym_Booking_Manager.Logger
+﻿namespace Gym_Booking_Manager.Logger
 {
     public class GBMLogger
     {

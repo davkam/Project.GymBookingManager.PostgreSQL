@@ -4,8 +4,8 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>290</x>
-      <y>450</y>
+      <x>320</x>
+      <y>390</y>
       <w>160</w>
       <h>220</h>
     </coordinates>
@@ -28,8 +28,8 @@ bg=gray</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>210</x>
-      <y>60</y>
+      <x>240</x>
+      <y>0</y>
       <w>320</w>
       <h>160</h>
     </coordinates>
@@ -47,8 +47,8 @@ bg=gray</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>190</x>
-      <y>230</y>
+      <x>220</x>
+      <y>170</y>
       <w>160</w>
       <h>160</h>
     </coordinates>
@@ -65,8 +65,8 @@ bg=gray</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>260</x>
-      <y>380</y>
+      <x>290</x>
+      <y>320</y>
       <w>130</w>
       <h>60</h>
     </coordinates>
@@ -77,8 +77,8 @@ bg=gray</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>360</x>
-      <y>210</y>
+      <x>390</x>
+      <y>150</y>
       <w>30</w>
       <h>260</h>
     </coordinates>
@@ -88,8 +88,8 @@ bg=gray</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>390</x>
-      <y>230</y>
+      <x>420</x>
+      <y>170</y>
       <w>160</w>
       <h>160</h>
     </coordinates>
@@ -102,8 +102,8 @@ bg=gray</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>360</x>
-      <y>380</y>
+      <x>390</x>
+      <y>320</y>
       <w>130</w>
       <h>60</h>
     </coordinates>
@@ -114,10 +114,10 @@ bg=gray</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>510</x>
-      <y>410</y>
+      <x>540</x>
+      <y>350</y>
       <w>400</w>
-      <h>280</h>
+      <h>410</h>
     </coordinates>
     <panel_attributes>/Activity/
 --
@@ -125,25 +125,31 @@ bg=gray</panel_attributes>
 -name: string
 -description: string
 -open: bool
--instructor: PTrainer()
--participantsLimit: int
+-limit: int
+-
+-instructor: Staff()
 -participants: List&lt;Customer()&gt;
 -reservation: Reservation()
--date: Calender()
+-date: Schedule()
 -
-+NewActivity(): void
++BookActivity(int week, int ID): void
+-ChooseSpace(int idStaff, DateTiume[] date, List int reservableToList): void
+-ChooseReservables(List int reservableToList): void
++LoadActivites(): void
++SaveActivites(): void
+-GetActivityID(): int
++NewActivity(int idStaff): void
 +EditActivity(): void
 +DeleteActivity(): void
-+ActivityRegister(customer: Customer()): void
-+ActivityCancel(customer: Customer(), activityID: int): void
-+ActivityView(customer: Customer())</panel_attributes>
++ActivityCancel(int ID): void
++ActivityView(int ID)</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>970</x>
-      <y>310</y>
+      <x>1000</x>
+      <y>250</y>
       <w>220</w>
       <h>180</h>
     </coordinates>
@@ -164,25 +170,32 @@ bg=gray</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>970</x>
-      <y>750</y>
+      <x>1000</x>
+      <y>770</y>
       <w>220</w>
-      <h>100</h>
+      <h>180</h>
     </coordinates>
-    <panel_attributes>Calendar
+    <panel_attributes>Schedule
 --
 timeFrom: DateTime()
 timeTo: DateTime()
 -
 +ViewCalendar(): void
++ViewScheduleMenu(int ID): void
+-SelectScheduleWeek(int ID): void
+-ViewScheduleWeek(int year, int week, int ID):void
+-ViewScheduleDay(int year, int week, ConsoleKeyInfo key, int ID):void
++DateSelecter(DateTime[] date):void
+
+
 </panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>970</x>
-      <y>530</y>
+      <x>1000</x>
+      <y>470</y>
       <w>220</w>
       <h>180</h>
     </coordinates>
@@ -204,8 +217,8 @@ timeTo: DateTime()
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1070</x>
-      <y>480</y>
+      <x>1100</x>
+      <y>420</y>
       <w>30</w>
       <h>70</h>
     </coordinates>
@@ -215,19 +228,19 @@ timeTo: DateTime()
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1070</x>
-      <y>700</y>
+      <x>1100</x>
+      <y>640</y>
       <w>30</w>
-      <h>70</h>
+      <h>150</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;130.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>440</x>
-      <y>560</y>
+      <x>470</x>
+      <y>500</y>
       <w>90</w>
       <h>30</h>
     </coordinates>
@@ -237,8 +250,8 @@ timeTo: DateTime()
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>900</x>
-      <y>610</y>
+      <x>930</x>
+      <y>550</y>
       <w>90</w>
       <h>30</h>
     </coordinates>
@@ -248,8 +261,8 @@ timeTo: DateTime()
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>570</x>
-      <y>230</y>
+      <x>600</x>
+      <y>170</y>
       <w>140</w>
       <h>90</h>
     </coordinates>
@@ -264,8 +277,8 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>970</x>
-      <y>80</y>
+      <x>1000</x>
+      <y>20</y>
       <w>220</w>
       <h>60</h>
     </coordinates>
@@ -279,8 +292,8 @@ bg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1070</x>
-      <y>130</y>
+      <x>1100</x>
+      <y>70</y>
       <w>90</w>
       <h>200</h>
     </coordinates>
@@ -291,8 +304,8 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>840</x>
-      <y>160</y>
+      <x>870</x>
+      <y>100</y>
       <w>220</w>
       <h>60</h>
     </coordinates>
@@ -306,8 +319,8 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1100</x>
-      <y>160</y>
+      <x>1130</x>
+      <y>100</y>
       <w>220</w>
       <h>60</h>
     </coordinates>
@@ -321,8 +334,8 @@ bg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>940</x>
-      <y>210</y>
+      <x>970</x>
+      <y>150</y>
       <w>290</w>
       <h>70</h>
     </coordinates>
@@ -333,8 +346,8 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>90</x>
-      <y>450</y>
+      <x>120</x>
+      <y>390</y>
       <w>180</w>
       <h>60</h>
     </coordinates>
@@ -347,8 +360,8 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>1210</x>
-      <y>530</y>
+      <x>1240</x>
+      <y>470</y>
       <w>280</w>
       <h>60</h>
     </coordinates>
@@ -361,8 +374,8 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>1210</x>
-      <y>310</y>
+      <x>1240</x>
+      <y>250</y>
       <w>280</w>
       <h>60</h>
     </coordinates>
@@ -373,43 +386,10 @@ bg=blue</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>1250</x>
-      <y>710</y>
-      <w>120</w>
-      <h>180</h>
-    </coordinates>
-    <panel_attributes>&lt;&lt;Enumeration&gt;&gt;
-WeekDays
---
-Monday
-Tuesday
-Wednesday
-Thursday
-Friday
-Saturday
-Sunday
---
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>1180</x>
-      <y>790</y>
-      <w>90</w>
-      <h>30</h>
-    </coordinates>
-    <panel_attributes>lt=-</panel_attributes>
-    <additional_attributes>10.0;10.0;70.0;10.0</additional_attributes>
-  </element>
-  <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>410</x>
-      <y>710</y>
+      <x>340</x>
+      <y>790</y>
       <w>240</w>
       <h>60</h>
     </coordinates>
@@ -422,12 +402,12 @@ bg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>700</x>
-      <y>680</y>
+      <x>730</x>
+      <y>750</y>
       <w>290</w>
-      <h>140</h>
+      <h>90</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;120.0;270.0;120.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0;270.0;70.0</additional_attributes>
   </element>
 </diagram>
