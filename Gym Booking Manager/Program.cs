@@ -1,4 +1,5 @@
 ﻿using Gym_Booking_Manager.Activities;
+using Gym_Booking_Manager.DBStorage;
 using Gym_Booking_Manager.Management.Logger;
 using Gym_Booking_Manager.Managements;
 using Gym_Booking_Manager.Reservables;
@@ -10,14 +11,17 @@ namespace Gym_Booking_Manager
     public class Program
     {
         // PUBLIC LOGGER INSTANTIATION:
-        public static GBMLogger logger = new GBMLogger("Logger/GBMLogger.txt");
+        public static GBMLogger? logger;
         static void Main(string[] args)
         {
-            // LOAD DATA METHODS RUNS BELOW:
-            User.LoadUsers();
-            Reservable.LoadReservables();
-            Reservation.LoadReservations();
-            Activity.LoadActivities();
+            logger = new GBMLogger("Logger/GBMLogger.txt");
+
+            User.CreateMainAdmin();
+
+            User.users.AddRange(Database.Instance.GetAllUsers());
+            Reservable.reservables = Database.Instance.GetAllReservables();
+            Reservation.reservations = Database.Instance.GetAllReservations();
+            Activity.activities = Database.Instance.GetAllActivities();
 
             // MAIN SOFTWARE LOOP RUNS BELOW:
             RunGBM();

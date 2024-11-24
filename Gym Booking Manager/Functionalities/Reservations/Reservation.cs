@@ -1,4 +1,5 @@
 ﻿using Gym_Booking_Manager.Dates;
+using Gym_Booking_Manager.DBStorage;
 using Gym_Booking_Manager.Reservables;
 using Gym_Booking_Manager.Users;
 
@@ -22,58 +23,7 @@ namespace Gym_Booking_Manager.Reservations
             this.reservables = reservables;
         }
         public Reservation() { }
-        public static void LoadReservations()
-        {
-            try
-            {
-                string[] lines = File.ReadAllLines("Functionalities/Reservations/Reservations.txt");
-                getReservationID = int.Parse(lines[0]);
 
-                for (int i = 1; i < lines.Length; i++)
-                {
-                    string[] stringsA = lines[i].Split(";");
-                    string[] stringsB = stringsA[4].Split(",");
-
-                    var reservables = new List<Reservable>();
-
-                    // Adding objects(Reservable) from public list(Reservable.reservables) to list(reservables) based on integers(Reservable.id).
-                    foreach (string strB in stringsB)
-                    {
-                        var reservable = Reservable.reservables.Find(r => r.id == int.Parse(strB));
-                        reservables.Add(reservable);
-                    }
-
-                    var owner = User.users.Find(u => u.id == int.Parse(stringsA[1]));
-                    var schedule = new Date(DateTime.Parse(stringsA[2]), DateTime.Parse(stringsA[3]));
-                    var reservation = new Reservation(int.Parse(stringsA[0]), owner, schedule, reservables);
-                    reservations.Add(reservation);
-                }
-                Program.logger.LogActivity("INFO: LoadReservations() - Read data (\"Reservations/Reservations.txt\") successful.");
-            }
-            catch { Program.logger.LogActivity("ERROR: LoadReservations() - Read data (\"Reservations/Reservations.txt\") unsuccessful."); }
-        }
-        public static void SaveReservations()
-        {
-            try
-            {
-                using (StreamWriter writer = new StreamWriter("Functionalities/Reservations/Reservations.txt", false))
-                {
-                    writer.WriteLine(getReservationID);
-                    foreach (Reservation rsv in reservations)
-                    {
-                        string reservables = string.Empty;
-                        foreach (Reservable rvb in rsv.reservables)
-                        {
-                            reservables += $"{rvb.id},";
-                        }
-                        reservables = reservables[0..^1];
-                        writer.WriteLine($"{rsv.id};{rsv.owner.id};{rsv.date.timeFrom};{rsv.date.timeTo};{reservables}");
-                    }
-                }
-                Program.logger.LogActivity("INFO: SaveReservations() - Write data (\"Reservations/Reservations.txt\") successful.");
-            }
-            catch { Program.logger.LogActivity("ERROR: SaveReservations() - Write data (\"Reservations/Reservations.txt\") unsuccessful."); }
-        }
         public static int GetReservationID()
         {
             int id = getReservationID;
@@ -183,8 +133,9 @@ namespace Gym_Booking_Manager.Reservations
                 {
                     list.Add(Reservable.reservables[ReservableToList[number - 1]]);
                     Console.WriteLine("You have booked " + Reservable.reservables[ReservableToList[number - 1]].name);
-                    reservations.Add(new Reservation(GetReservationID(), User.users[userID], new Date(date[0], date[1]), list));
-                    SaveReservations();
+                    Reservation reservation = new Reservation(GetReservationID(), User.users[userID], new Date(date[0], date[1]), list);
+                    Database.Instance.AddReservation(reservation);
+                    reservations.Add(reservation);
                     break;
                 }
                 else
@@ -236,6 +187,7 @@ namespace Gym_Booking_Manager.Reservations
                     Task.Delay(1500).Wait();
                     return;
                 }
+                Database.Instance.RemoveReservation(reservation);
                 reservations.Remove(reservation);
                 Console.WriteLine(">> Reservation successfully deleted!");
                 Task.Delay(1000).Wait();
@@ -246,7 +198,6 @@ namespace Gym_Booking_Manager.Reservations
                 Task.Delay(1500).Wait();
                 return;
             }
-            SaveReservations();
         }
         public static void ViewReservations(User user, bool header = true, bool footer = true)
         {

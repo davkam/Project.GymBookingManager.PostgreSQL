@@ -1,5 +1,6 @@
 ﻿using Gym_Booking_Manager.ActivityExtenstion;
 using Gym_Booking_Manager.Dates;
+using Gym_Booking_Manager.DBStorage;
 using Gym_Booking_Manager.Reservables;
 using Gym_Booking_Manager.Reservations;
 using Gym_Booking_Manager.Users;
@@ -36,63 +37,6 @@ namespace Gym_Booking_Manager.Activities
             this.participants = participants;
         }
         public Activity() { }
-        public static void LoadActivities()
-        {
-            try
-            {
-                string[] lines = File.ReadAllLines("Functionalities/Activities/Activities.txt");
-                getActivityID = int.Parse(lines[0]);
-
-                for (int i = 1; i < lines.Length; i++)
-                {
-                    string[] stringsA = lines[i].Split(";");
-                    string[] stringsB = stringsA[9].Split(",");
-
-                    var participants = new List<Customer>();
-
-                    if (stringsB.Length > 0)
-                    {
-                        foreach (string strB in stringsB)
-                        {
-                            participants.Add((Customer)User.users.Find(user => user.id == int.Parse(strB)));
-                        }
-                    }
-                    var staff = (Staff)User.users.Find(u => u.id == int.Parse(stringsA[5]));
-                    var schedule = new Date(DateTime.Parse(stringsA[6]), DateTime.Parse(stringsA[7]));
-                    var reservation = Reservation.reservations.Find(r => r.id == int.Parse(stringsA[8]));
-                    var activity = new Activity(int.Parse(stringsA[0]), stringsA[1], stringsA[2], bool.Parse(stringsA[3]), int.Parse(stringsA[4]), staff, schedule, reservation, participants);
-                    activities.Add(activity);
-                }
-                Program.logger.LogActivity("INFO: LoadActivities() - Read data (\"Activities/Activities.txt\") successful.");
-            }
-            catch { Program.logger.LogActivity("ERROR: LoadActivities() - Read data (\"Activities/Activities.txt\") unsuccessful."); }
-        }
-        public static void SaveActivities()
-        {
-            try
-            {
-                using (StreamWriter writer = new StreamWriter("Functionalities/Activities/Activities.txt", false))
-                {
-                    writer.WriteLine(getActivityID);
-                    foreach (Activity activity in activities)
-                    {
-                        string participants = string.Empty;
-                        if (activity.participants.Count > 0)
-                        {
-                            foreach (Customer customer in activity.participants)
-                            {
-                                participants += $"{customer.id},";
-                            }
-                        }
-                        participants = participants[0..^1];
-                        writer.WriteLine($"{activity.id};{activity.name};{activity.description};{activity.open};{activity.limit};{activity.instructor.id};{activity.date.timeFrom};" +
-                            $"{activity.date.timeTo};{activity.reservation.id};{participants}");
-                    }
-                }
-                Program.logger.LogActivity("INFO: SaveActivities() - Write data (\"Activities/Activities.txt\") successful.");
-            }
-            catch { Program.logger.LogActivity("ERROR: SaveActivities() - Write data (\"Activities/Activities.txt\") unsuccessful."); }
-        }
         private static int GetActivityID()
         {
             int id = getActivityID;
@@ -119,6 +63,7 @@ namespace Gym_Booking_Manager.Activities
                     Reservation.reservations[Reservation.reservations.Count() - 1].reservables.Add(Reservable.reservables[reservableToList[number - 1]]);
                     Console.WriteLine("You have booked " + Reservable.reservables[reservableToList[number - 1]].name);
                     reservableToList.RemoveAt(number - 1);
+                    Database.Instance.UpdateReservation(Reservation.reservations[Reservation.reservations.Count() - 1]);
                 }
                 else if (number == 0 || PTcheck > 0) break;
                 else if (number == 0) Console.WriteLine("You must select at least one PT!");
@@ -127,7 +72,6 @@ namespace Gym_Booking_Manager.Activities
                     Console.WriteLine("Incorrect input!");
                 }
             }
-            Reservation.SaveReservations();
         }
         public static void NewActivity(Staff staff) // TBD: Parameter to Staff!
         {
@@ -195,9 +139,10 @@ namespace Gym_Booking_Manager.Activities
             else Console.WriteLine("Incorrect input!");
             }
             Reservation Reservationn = Reservation.reservations[Reservation.reservations.Count() - 1];
-            Date datee = new Date(date[0], date[1]); 
-            Activity.activities.Add(new Activity(id, Name, Description, Open, participantsNo, Instructor, datee, Reservationn, Participants));
-            SaveActivities();
+            Date datee = new Date(date[0], date[1]);
+            Activity activity = new Activity(id, Name, Description, Open, participantsNo, Instructor, datee, Reservationn, Participants);
+            Database.Instance.AddActivity(activity);
+            activities.Add(activity);
         }
         static void ChooseSpace(Staff staff, DateTime[] date, List<int> reservableToList) // TBD: Parameter to Staff!
         {
@@ -218,8 +163,9 @@ namespace Gym_Booking_Manager.Activities
                 {
                     list.Add(Reservable.reservables[reservableToList[number - 1]]);
                     Console.WriteLine("You have booked " + Reservable.reservables[reservableToList[number - 1]].name);
-                    Reservation.reservations.Add(new Reservation(Reservation.GetReservationID(), staff, new Date(date[0], date[1]), list));
-                    Reservation.SaveReservations();
+                    Reservation reservation = new Reservation(Reservation.GetReservationID(), staff, new Date(date[0], date[1]), list);
+                    Database.Instance.AddReservation(reservation);
+                    Reservation.reservations.Add(reservation);
                     break;
                 }
                 else
@@ -246,8 +192,8 @@ namespace Gym_Booking_Manager.Activities
             if (number > 0 && number < activities.Count())
             {
                 Console.WriteLine("You have deleted " + activities[number - 1].name);
+                Database.Instance.RemoveActivity(activities[number - 1]);
                 activities.RemoveAt(number - 1);
-                SaveActivities();
             }
             else Console.WriteLine("Incorrect input");
             Thread.Sleep(2000);
@@ -279,6 +225,7 @@ namespace Gym_Booking_Manager.Activities
                     }
                     a.participants.Add(customer);
                     Console.WriteLine(">> Activity registration successful!");
+                    Database.Instance.UpdateActivity(a);
                 }
                 else if (a.id == result && a.limit <= a.participants.Count() && customer.subEnd > a.date.timeFrom && a.participants.Contains(customer) == false)
                 {
@@ -293,7 +240,6 @@ namespace Gym_Booking_Manager.Activities
                     Console.WriteLine(">> Activity date is later than subscription, registration cancelled!");
                 }
             }
-            SaveActivities();
             Task.Delay(1500).Wait();
         }
         public static void DeregisterActivity(Customer customer)   // CHECK!!
@@ -319,15 +265,15 @@ namespace Gym_Booking_Manager.Activities
             Console.Write("\n>> Enter number of activity to deregister (\"0\" to exit): ");
             string? input = Console.ReadLine();
             int.TryParse(input, out result);
-            deregisterActivity = activities.Find(a => a.id == registeredActivityIDs[result - 1]);
 
             if (result == 0) Console.WriteLine(">> Activity deregistration cancelled!");
             else if (result > 0 && result < registeredActivityIDs.Count())
             {
+                deregisterActivity = activities.Find(a => a.id == registeredActivityIDs[result - 1]);
                 deregisterActivity.participants.Remove(customer);
 
                 Console.WriteLine($">> Activity {deregisterActivity.name} successfully deregistered!");
-                SaveActivities();
+                Database.Instance.UpdateActivity(deregisterActivity);
             }
             else Console.WriteLine(">> Invalid input, activity deregistration cancelled!");
             Task.Delay(1500).Wait();

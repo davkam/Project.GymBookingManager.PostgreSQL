@@ -15,6 +15,12 @@
         }
         public void LogActivity(string message)
         {
+            string logDirectory = Path.GetDirectoryName(_logFilePath);
+            if (!Directory.Exists(logDirectory))
+            {
+                Directory.CreateDirectory(logDirectory);
+            }
+
             using (StreamWriter writer = File.AppendText(_logFilePath))
             {
                 writer.WriteLine($"{DateTime.Now} - {message}");

@@ -1,6 +1,7 @@
 using Gym_Booking_Manager.Activities;
 using Gym_Booking_Manager.ActivityExtenstion;
 using Gym_Booking_Manager.Dates;
+using Gym_Booking_Manager.DBStorage;
 using Gym_Booking_Manager.Managements;
 using Gym_Booking_Manager.Reservables;
 using Gym_Booking_Manager.Reservations;
@@ -15,7 +16,7 @@ namespace Gym_Booking_Manager.Users
         protected static int oneMonthSubFee = 25;
         protected static int oneYearSubFee = 250;
 
-        public int id { get; set; } // TBD: USE GUID?
+        public int id { get; set; } // NYI: Use GUID
         public string? firstName { get; set; }
         public string? lastName { get; set; }
         public string? ssn { get; set; }
@@ -35,50 +36,19 @@ namespace Gym_Booking_Manager.Users
             this.loginPass = loginPass;
         }
         public User() { }
-        public static void LoadUsers()
+        public static void CreateMainAdmin()
         {
-            try
+            Admin mainAdmin = new Admin()
             {
-                string[] lines = File.ReadAllLines("Users/Users.txt");
-                getUserID = int.Parse(lines[0]);
-                for (int i = 1; i < lines.Length; i++)
-                {
-                    string[] strings = lines[i].Split(";");
-                    if (strings[0] == "Admin") users.Add(new Admin(int.Parse(strings[1]), strings[2], strings[3], (strings[4]), strings[5], strings[6], strings[7], strings[8]));
-                    if (strings[0] == "Staff") users.Add(new Staff(int.Parse(strings[1]), strings[2], strings[3], (strings[4]), strings[5], strings[6], strings[7], strings[8]));
-                    if (strings[0] == "Customer") users.Add(new Customer(int.Parse(strings[1]), strings[2], strings[3], (strings[4]), strings[5], strings[6], strings[7], strings[8], DateTime.Parse(strings[9]), DateTime.Parse(strings[10]), bool.Parse(strings[11])));
-                }
-                Program.logger.LogActivity("INFO: LoadUsers() - Read data (\"Users/Users.txt\") successful.");
-            }
-            catch { Program.logger.LogActivity("ERROR: LoadUsers() - Read data (\"Users/Users.txt\") unsuccessful."); }
-        }
-        public static void SaveUsers()
-        {
-            try
-            {
-                using (StreamWriter writer = new StreamWriter("Users/Users.txt", false))
-                {
-                    writer.WriteLine(getUserID);
-                    foreach (User user in users)
-                    {
-                        if (user is Admin)
-                        {
-                            writer.WriteLine($"Admin;{user.id};{user.firstName};{user.lastName};{user.ssn};{user.phone};{user.email};{user.loginName};{user.loginPass}");
-                        }
-                        if (user is Staff)
-                        {
-                            writer.WriteLine($"Staff;{user.id};{user.firstName};{user.lastName};{user.ssn};{user.phone};{user.email};{user.loginName};{user.loginPass}");
-                        }
-                        if (user is Customer)
-                        {
-                            Customer saveUser = (Customer)user;
-                            writer.WriteLine($"Customer;{saveUser.id};{user.firstName};{saveUser.lastName};{saveUser.ssn};{saveUser.phone};{saveUser.email};{saveUser.loginName};{saveUser.loginPass};{saveUser.subStart};{saveUser.subEnd};{saveUser.isSub}");
-                        }
-                    }
-                }
-                Program.logger.LogActivity("INFO: SaveUsers() - Write data (\"Users/Users.txt\") successful.");
-            }
-            catch { Program.logger.LogActivity("ERROR: SaveUsers() - Write data (\"Users/Users.txt\") unsuccessful."); }
+                id = 0,
+                firstName = "ADMIN",
+                lastName = "MAIN",
+                loginName = "admin",
+                loginPass = "abc123"
+            };
+
+            users.Add(mainAdmin);
+            getUserID = 1;
         }
         private static int GetUserID()
         {
@@ -86,6 +56,13 @@ namespace Gym_Booking_Manager.Users
             getUserID++;
             return id;
         }
+        public string GetUserType() => this switch
+        {
+            Admin => "admin",
+            Staff => "staff",
+            Customer => "customer",
+            _ => throw new InvalidOperationException("Unknown user type")
+        };
         protected void RegisterUser() // NYI: ADD LOGGER!
         {
             User user = new Customer();
@@ -174,7 +151,7 @@ namespace Gym_Booking_Manager.Users
             Console.ReadKey(true);
 
             users.Add(user);
-            SaveUsers();
+            Database.Instance.AddUser(user);
 
             Program.logger.LogActivity($"INFO: RegisterUser() - New account registration successful. USER: {user.loginName}");
 
@@ -242,6 +219,7 @@ namespace Gym_Booking_Manager.Users
                 if (keyInfo.Key == ConsoleKey.Y)
                 {
                     Console.WriteLine($">> User ({users[userIndex].loginName}) deregistration successful!");
+                    Database.Instance.RemoveUser(users[userIndex]);
                     users.RemoveAt(userIndex);
                 }
                 else if (keyInfo.Key == ConsoleKey.N || keyInfo.Key == ConsoleKey.Escape)
@@ -254,7 +232,6 @@ namespace Gym_Booking_Manager.Users
                     Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}], deregistration unsuccessful!");
                     Task.Delay(1500).Wait();
                 }
-                SaveUsers();
             }
             else
             {
@@ -337,7 +314,7 @@ namespace Gym_Booking_Manager.Users
             }
             Console.WriteLine($">> Update information successful!");
             Task.Delay(1500).Wait();
-            SaveUsers();
+            Database.Instance.UpdateUser(this);
         }
         protected void UpdateLogin() // NYI: ADD LOGGER!
         {
@@ -382,7 +359,7 @@ namespace Gym_Booking_Manager.Users
             else Console.WriteLine($">> INVALID KEY: [{keyInfo.Key}]");
 
             Task.Delay(1500).Wait();
-            SaveUsers();
+            Database.Instance.RemoveUser(this);
         }
         protected void ViewInfo()
         {
@@ -845,7 +822,7 @@ namespace Gym_Booking_Manager.Users
             if (footer)
             {
                 Task.Delay(2000).Wait();
-                SaveUsers();
+                Database.Instance.UpdateUser(this);
             }
         }
         private void ViewSubscription()

@@ -1,4 +1,5 @@
-﻿using Gym_Booking_Manager.Reservations;
+﻿using Gym_Booking_Manager.DBStorage;
+using Gym_Booking_Manager.Reservations;
 using Gym_Booking_Manager.Users;
 
 namespace Gym_Booking_Manager.Reservables
@@ -20,73 +21,19 @@ namespace Gym_Booking_Manager.Reservables
             this.isAvailable = isAvailable;
         }
         public Reservable() { }
-        public static void LoadReservables()
-        {
-            try
-            {
-                string[] lines = File.ReadAllLines("Functionalities/Reservables/Reservables.txt");
-                getReservableID = int.Parse(lines[0]);
-
-                for (int i = 1; i < lines.Length; i++)
-                {
-                    string[] strings = lines[i].Split(";");
-                    if (strings[0] == "Equipment")
-                    {
-                        var equipment = new Equipment(int.Parse(strings[1]), strings[2], strings[3], bool.Parse(strings[4]), bool.Parse(strings[5]));
-                        reservables.Add(equipment);
-                    }
-                    if (strings[0] == "Space")
-                    {
-                        var space = new Space(int.Parse(strings[1]), strings[2], strings[3], bool.Parse(strings[4]), int.Parse(strings[5]));
-                        reservables.Add(space);
-                    }
-                    if (strings[0] == "PTrainer")
-                    {
-                        var staff = (Staff)User.users.Find(u => u.id == int.Parse(strings[3]));
-                        var ptrainer = new PTrainer(int.Parse(strings[1]), bool.Parse(strings[2]), staff);
-                        reservables.Add(ptrainer);
-                    }
-                }
-                Program.logger.LogActivity("INFO: LoadReservables() - Read data (\"Functionalities/Reservables/Reservables.txt\") successful.");
-            }
-            catch { Program.logger.LogActivity("ERROR: LoadReservables() - Read data (\"Functionalities/Reservables/Reservables.txt\") unsuccessful."); }
-        }
-        public static void SaveReservables()
-        {
-            try
-            {
-                using (StreamWriter writer = new StreamWriter("Functionalities/Reservables/Reservables.txt", false))
-                {
-                    writer.WriteLine(getReservableID);
-                    for (int i = 0; i < reservables.Count; i++)
-                    {
-                        if (reservables[i] is Equipment)
-                        {
-                            Equipment equipment = (Equipment)reservables[i];
-                            writer.WriteLine($"Equipment;{equipment.id};{equipment.name};{equipment.description};{equipment.isAvailable};{equipment.membersOnly}");
-                        }
-                        if (reservables[i] is Space)
-                        {
-                            Space space = (Space)reservables[i];
-                            writer.WriteLine($"Space;{space.id};{space.name};{space.description};{space.isAvailable};{space.capacity}");
-                        }
-                        if (reservables[i] is PTrainer)
-                        {
-                            PTrainer ptrainer = (PTrainer)reservables[i];
-                            writer.WriteLine($"PTrainer;{ptrainer.id};{ptrainer.isAvailable};{ptrainer.instructor.id}");
-                        }
-                    }
-                }
-                Program.logger.LogActivity("INFO: SaveReservables() - Write data (\"Functionalities/Reservables/Reservables.txt\") successful.");
-            }
-            catch { Program.logger.LogActivity("ERROR: SaveReservables() - Write data (\"Functionalities/Reservables/Reservables.txt\") unsuccessful."); }
-        }
         private static int GetReservableID()
         {
             int id = getReservableID;
             getReservableID++;
             return id;
         }
+        public string GetReservableType() => this switch
+        {
+            Equipment => "equipment",
+            Space => "space",
+            PTrainer => "ptrainer",
+            _ => throw new InvalidOperationException("Unknown user type")
+        };
         public static void NewReservable(Staff staff)   // NYI: LOG ACTIVITY!
         {
             bool run = true;
@@ -178,7 +125,7 @@ namespace Gym_Booking_Manager.Reservables
             }
 
             reservables.Add(newEquipment);
-            SaveReservables();
+            Database.Instance.AddReservable(newEquipment);
 
             Console.WriteLine($">> New equipment ({name}) successfully added to reservables!");
             Task.Delay(1500).Wait();
@@ -224,7 +171,7 @@ namespace Gym_Booking_Manager.Reservables
             }
 
             reservables.Add(newSpace);
-            SaveReservables();
+            Database.Instance.AddReservable(newSpace);
 
             Console.WriteLine($">> New space ({name}) successfully added to reservables!");
             Task.Delay(1500).Wait();
@@ -313,7 +260,7 @@ namespace Gym_Booking_Manager.Reservables
                 }
             }
             reservables.Add(newPT);
-            SaveReservables();
+            Database.Instance.AddReservable(newPT);
         }
         private static bool CheckStaffInPTs(Staff staff)
         {
@@ -361,9 +308,9 @@ namespace Gym_Booking_Manager.Reservables
                     Task.Delay(1500).Wait();
                     return;
                 }
+                Database.Instance.RemoveReservable(reservables[index]);
                 reservables.RemoveAt(index);
                 Console.WriteLine(">> Reservable successfully deleted.");
-                SaveReservables();
             }
             else Console.WriteLine(">> Reservable not found or reservable is registered in a reservation, try again!");
             Task.Delay(1500).Wait();
@@ -431,7 +378,7 @@ namespace Gym_Booking_Manager.Reservables
                 Task.Delay(1500).Wait();
                 return;
             }
-            SaveReservables();
+            Database.Instance.UpdateReservable(reservable);
         }
         private static void EditReservableName(ref Reservable reservable)
         {
@@ -771,6 +718,7 @@ namespace Gym_Booking_Manager.Reservables
         {
             this.capacity = capacity;
         }
+        public Space() : base() { }
     }
     public class PTrainer : Reservable
     {
